@@ -1,0 +1,2031 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Плюс один процент</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="theme-color" content="#f4f3ef" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121211" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="+1%">
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f4f3ef;
+    --surface: #fcfcfb;
+    --soft: #efeee9;
+    --line: #e3e1da;
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --ink-3: #85837c;
+    --btn: #1d1d1b;
+    --btn-ink: #fcfcfb;
+    --good: #0ca30c;
+    --good-ink: #006300;
+    --bad: #d03b3b;
+    --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100;
+    --c5: #e87ba4; --c6: #008300; --c7: #6250d6; --c8: #e34948;
+    --h1: #b7d3f6; --h2: #6da7ec; --h3: #2a78d6; --h4: #104281;
+    --shadow: 0 1px 2px rgba(30,30,20,.05), 0 4px 18px rgba(30,30,20,.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #121211; --surface: #1a1a19; --soft: #242422; --line: #2f2f2c;
+      --ink: #f0efec; --ink-2: #c3c2b7; --ink-3: #8f8d84;
+      --btn: #f0efec; --btn-ink: #121211; --good-ink: #4cc24c; --bad: #e66767;
+      --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500;
+      --c5: #d55181; --c6: #008300; --c7: #9085e9; --c8: #e66767;
+      --h1: #184f95; --h2: #256abf; --h3: #3987e5; --h4: #86b6ef;
+      --shadow: none;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #121211; --surface: #1a1a19; --soft: #242422; --line: #2f2f2c;
+    --ink: #f0efec; --ink-2: #c3c2b7; --ink-3: #8f8d84;
+    --btn: #f0efec; --btn-ink: #121211; --good-ink: #4cc24c; --bad: #e66767;
+    --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500;
+    --c5: #d55181; --c6: #008300; --c7: #9085e9; --c8: #e66767;
+    --h1: #184f95; --h2: #256abf; --h3: #3987e5; --h4: #86b6ef;
+    --shadow: none;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 16px 16px 64px; }
+
+  header.top { display: flex; align-items: center; gap: 12px; justify-content: space-between; flex-wrap: wrap; padding: 8px 0 14px; }
+  .brand { display: flex; align-items: baseline; gap: 10px; }
+  .brand h1 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
+  .brand .tagline { color: var(--ink-3); font-size: 13px; }
+  nav.tabs { display: flex; gap: 2px; background: var(--soft); border-radius: 12px; padding: 3px; overflow-x: auto; max-width: 100%; }
+  nav.tabs button { border: 0; background: none; padding: 7px 12px; border-radius: 9px; cursor: pointer; color: var(--ink-2); white-space: nowrap; font-size: 14px; }
+  nav.tabs button.on { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.08); font-weight: 600; }
+  .icon-btn { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; width: 36px; height: 36px; cursor: pointer; }
+
+  .grid { display: grid; gap: 14px; }
+  .g2 { grid-template-columns: 1fr; }
+  @media (min-width: 880px) { .g2 { grid-template-columns: 1fr 1fr; } .g2 .wide { grid-column: 1 / -1; } }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; box-shadow: var(--shadow); min-width: 0; }
+  .card h2 { font-size: 15px; margin: 0 0 4px; font-weight: 650; }
+  .card .lead { color: var(--ink-2); font-size: 13px; margin: 0 0 14px; }
+  .muted { color: var(--ink-3); }
+
+  .kpis { display: grid; gap: 10px; grid-template-columns: repeat(2, 1fr); margin-bottom: 14px; }
+  @media (min-width: 760px) { .kpis { grid-template-columns: repeat(4, 1fr); } }
+  .kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; box-shadow: var(--shadow); min-width: 0; }
+  .kpi-l { font-size: 12px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .kpi-v { font-size: 26px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; line-height: 1.2; margin: 2px 0; }
+  .kpi-s { font-size: 12px; color: var(--ink-3); }
+  .kpi-s.up { color: var(--good-ink); }
+  .kpi-s.down { color: var(--bad); }
+  .bar { height: 6px; background: var(--soft); border-radius: 99px; overflow: hidden; margin: 6px 0 4px; }
+  .bar i { display: block; height: 100%; background: var(--ink); border-radius: 99px; transition: width .4s; }
+
+  .datenav { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .datenav b { flex: 1; text-align: center; font-size: 15px; }
+  .datenav button { border: 1px solid var(--line); background: var(--surface); width: 34px; height: 34px; border-radius: 10px; cursor: pointer; font-size: 18px; line-height: 1; }
+  .datenav button:disabled { opacity: .3; cursor: default; }
+  .datenav .back-today { width: auto; padding: 0 10px; font-size: 13px; }
+
+  .duel-row { display: grid; grid-template-columns: 70px 1fr 64px; align-items: center; gap: 10px; margin: 8px 0; font-size: 13px; }
+  .duel-row .who { color: var(--ink-2); }
+  .duel-row .val { text-align: right; font-weight: 650; font-variant-numeric: tabular-nums; }
+  .track { position: relative; height: 22px; background: var(--soft); border-radius: 6px; }
+  .track .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 0 4px 4px 0; background: var(--ink-3); transition: width .4s; }
+  .track .fill.me { background: var(--c1); }
+  .track .min { position: absolute; top: -4px; bottom: -4px; border-left: 2px dashed var(--ink-2); }
+  .min-note { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+  .pill { display: inline-flex; gap: 6px; align-items: center; padding: 6px 12px; border-radius: 99px; background: var(--soft); font-size: 13px; font-weight: 600; margin-top: 10px; }
+  .pill.good { background: color-mix(in srgb, var(--good) 14%, transparent); color: var(--good-ink); }
+  .pill.bad { background: color-mix(in srgb, var(--bad) 12%, transparent); color: var(--bad); }
+  .focus-banner { margin-top: 12px; padding: 10px 12px; border-radius: 12px; border: 1px dashed var(--line); font-size: 13px; color: var(--ink-2); }
+
+  .sphere-group { margin-bottom: 12px; }
+  .sphere-head { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-2); margin-bottom: 6px; }
+  .sphere-head .lv { margin-left: auto; font-size: 12px; color: var(--ink-3); }
+  .sw { width: 10px; height: 10px; border-radius: 3px; display: inline-block; flex: none; }
+  .x2 { font-size: 11px; font-weight: 700; background: var(--btn); color: var(--btn-ink); padding: 1px 6px; border-radius: 99px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: var(--surface); padding: 7px 11px; border-radius: 10px; cursor: pointer; text-align: left; transition: background .15s, border-color .15s; }
+  .chip:hover { background: var(--soft); }
+  .chip .box { width: 16px; height: 16px; border-radius: 5px; border: 2px solid var(--ink-3); flex: none; display: grid; place-items: center; font-size: 11px; line-height: 1; }
+  .chip .xp { font-size: 12px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .chip.on { border-color: var(--ink); }
+  .chip.on .box { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+  .chip.on .box::after { content: "✓"; }
+
+  .quest { display: flex; gap: 10px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .quest:last-of-type { border-bottom: 0; }
+  .quest .chip { flex: 1; border: 0; padding: 0; background: none; align-items: flex-start; }
+  .quest .chip .box { margin-top: 3px; }
+  .quest .chip.on .t { text-decoration: line-through; color: var(--ink-3); }
+
+  .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .row > * { min-width: 0; }
+  input[type=text], input[type=number], select, textarea {
+    background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; outline: none;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--ink-2); }
+  textarea { width: 100%; resize: vertical; min-height: 84px; }
+  .btn { border: 1px solid var(--line); background: var(--surface); padding: 8px 14px; border-radius: 10px; cursor: pointer; font-weight: 600; }
+  .btn:hover { background: var(--soft); }
+  .btn.primary { background: var(--btn); color: var(--btn-ink); border-color: var(--btn); }
+  .btn.primary:hover { opacity: .9; }
+  .btn.danger { color: var(--bad); }
+  .btn:disabled { opacity: .4; cursor: default; }
+  .btn.small { padding: 4px 10px; font-size: 13px; }
+
+  .logs { list-style: none; margin: 10px 0 0; padding: 0; }
+  .logs li { display: flex; gap: 8px; align-items: center; padding: 6px 0; font-size: 14px; border-bottom: 1px solid var(--line); }
+  .logs li:last-child { border-bottom: 0; }
+  .logs .t { flex: 1; overflow-wrap: anywhere; }
+  .logs .x { border: 0; background: none; cursor: pointer; color: var(--ink-3); font-size: 18px; line-height: 1; }
+
+  /* charts */
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--ink-2); margin-bottom: 8px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i { width: 18px; height: 0; border-top: 2px solid; display: inline-block; }
+  .legend i.dash { border-top-style: dashed; }
+  .chart { width: 100%; position: relative; }
+  .chart svg { display: block; width: 100%; overflow: visible; }
+  .chart text { font-size: 11px; fill: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .chart .lbl { font-size: 12px; font-weight: 650; }
+  .formula { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 14px; }
+  .formula div { background: var(--soft); border-radius: 12px; padding: 10px 12px; font-size: 12px; color: var(--ink-2); }
+  .formula b { display: block; font-size: 18px; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+  .heat-wrap { overflow-x: auto; padding-bottom: 4px; }
+  .heat { --cell: 13px; display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, var(--cell)); gap: 3px; width: max-content; }
+  .heat i { width: var(--cell); height: var(--cell); border-radius: 3px; background: var(--soft); }
+  .heat i.none { background: transparent; }
+  .heat i.before { opacity: .45; }
+  .heat i.l1 { background: var(--h1); } .heat i.l2 { background: var(--h2); }
+  .heat i.l3 { background: var(--h3); } .heat i.l4 { background: var(--h4); }
+  .heat i.rest { background: transparent; box-shadow: inset 0 0 0 1.5px var(--ink-3); }
+  .heat i.today { outline: 2px solid var(--ink); outline-offset: 1px; }
+  .heat-legend { display: flex; gap: 4px; align-items: center; font-size: 12px; color: var(--ink-3); margin-top: 8px; flex-wrap: wrap; }
+  .heat-legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+  .stat { background: var(--soft); border-radius: 12px; padding: 10px 12px; }
+  .stat b { display: block; font-size: 20px; font-variant-numeric: tabular-nums; }
+  .stat span { font-size: 12px; color: var(--ink-2); }
+
+  .journal-list { list-style: none; margin: 0; padding: 0; max-height: 360px; overflow: auto; }
+  .journal-list li { padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .journal-list .d { font-size: 12px; color: var(--ink-3); }
+
+  .spheres { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+  .sphere-card { border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; }
+  .sphere-card .top { display: flex; align-items: center; gap: 8px; }
+  .sphere-card .ic { font-size: 22px; }
+  .sphere-card .nm { font-weight: 650; }
+  .sphere-card .lvl { margin-left: auto; font-size: 13px; font-weight: 700; }
+  .sphere-card .bar i { background: var(--sc); }
+  .sphere-card .meta { font-size: 12px; color: var(--ink-3); display: flex; justify-content: space-between; }
+
+  .badges { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+  .badge { border: 1px solid var(--line); border-radius: 14px; padding: 14px; text-align: center; }
+  .badge .ic { font-size: 34px; line-height: 1.2; }
+  .badge .nm { font-weight: 650; margin-top: 4px; }
+  .badge .ds { font-size: 12px; color: var(--ink-2); }
+  .badge .st { font-size: 12px; color: var(--ink-3); margin-top: 6px; }
+  .badge.locked .ic { filter: grayscale(1); opacity: .35; }
+  .badge.locked .nm { color: var(--ink-2); }
+  .badge .bar i { background: var(--ink-3); }
+
+  .set-row { display: flex; gap: 8px; align-items: center; padding: 6px 0; flex-wrap: wrap; }
+  .set-row input[type=text] { flex: 1; min-width: 140px; }
+  .set-row .emoji { width: 52px; text-align: center; flex: none; min-width: 0; }
+  .set-row select { max-width: 170px; }
+  .habit-set { border-bottom: 1px solid var(--line); padding: 10px 0; }
+  .set-row input.ask { flex: 1 1 100%; font-size: 13px; }
+
+  .chip.sb.on { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 8%, var(--surface)); }
+  .chip.sb.on .box { background: var(--bad); border-color: var(--bad); color: #fff; }
+  .chip.sb.on .box::after { content: "!"; font-weight: 800; }
+  .goal-row { padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .goal-row:last-child { border-bottom: 0; padding-bottom: 0; }
+  .goal-title { display: flex; flex-wrap: wrap; gap: 2px 10px; align-items: baseline; font-size: 14px; }
+  .goal-title .muted { font-size: 12px; }
+  .goal-row .bar { margin: 6px 0 8px; }
+  .goal-term { font-size: 12px; color: var(--ink-3); margin-top: 6px; }
+  .goal-term .late { color: var(--bad); font-weight: 600; }
+  .goal-term .early { color: var(--good-ink); font-weight: 600; }
+  .goal-measure { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 14px; }
+  .goal-measure input { width: 90px; }
+  .gcards { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+  .gcard { border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+  .gcard .top { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+  .gcard .medal { font-size: 22px; line-height: 1; }
+  .gcard .kind { margin-left: auto; font-size: 12px; color: var(--ink-3); }
+  .gcard .meta { font-size: 13px; color: var(--ink-2); }
+  .gcard .acts { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .tpls { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+  .tpl { text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 10px 12px; cursor: pointer; }
+  .tpl:hover, .tpl.on { border-color: var(--ink); }
+  .tpl b { display: block; font-size: 14px; }
+  .tpl span { font-size: 12px; color: var(--ink-3); }
+  .gform { margin-top: 14px; padding: 14px; border-radius: 14px; background: var(--soft); }
+  .gform .set-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+  .gform label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--ink-2); }
+  .gform input, .gform select { width: 100%; background: var(--surface); }
+  .gform .wide-f { grid-column: 1 / -1; }
+  .preview { margin-top: 10px; font-size: 13px; color: var(--ink); line-height: 1.6; }
+  .preview .warn { color: var(--bad); }
+  .prof { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+  .prof label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--ink-2); }
+  .prof input { width: 100%; }
+  .sb-list summary { cursor: pointer; font-size: 14px; color: var(--ink-2); display: inline-block; padding: 6px 12px; border: 1px dashed var(--line); border-radius: 10px; }
+  .sb-list summary:hover { background: var(--soft); }
+  .sb-list[open] summary { border-style: solid; }
+  .sb-rec { margin-top: 10px; padding: 10px 12px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--bad) 35%, var(--line)); }
+  .sb-head { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; font-size: 14px; margin-bottom: 6px; }
+  .sb-head .pen { color: var(--bad); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .sb-head .muted { font-size: 12px; }
+  .sb-rec textarea { min-height: 52px; }
+  .note { display: block; margin-top: 8px; padding-left: 12px; border-left: 2px solid var(--line); }
+  .note-q { display: block; font-size: 12px; color: var(--ink-2); margin-bottom: 4px; }
+  .note textarea { min-height: 52px; }
+
+  /* вкладки: значки только на телефоне */
+  nav.tabs i { display: none; font-style: normal; }
+  nav.tabs .ls { display: none; }
+  @media (max-width: 640px) {
+    body { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
+    header.top { flex-wrap: nowrap; }
+    .brand .tagline { display: none; }
+    nav.tabs {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 15; max-width: none;
+      border-radius: 0; padding: 4px 2px calc(4px + env(safe-area-inset-bottom));
+      background: var(--surface); border-top: 1px solid var(--line); gap: 0; overflow: visible;
+    }
+    nav.tabs button { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 5px 0; font-size: 10px; border-radius: 10px; }
+    nav.tabs button.on { box-shadow: none; background: var(--soft); }
+    nav.tabs i { display: block; font-size: 19px; line-height: 1.2; }
+    nav.tabs button:has(.ls) .lf { display: none; }
+    nav.tabs .ls { display: block; }
+    .toasts { bottom: calc(80px + env(safe-area-inset-bottom)); }
+  }
+
+  /* отчёт */
+  .notes-list { list-style: none; margin: 0; padding: 0; max-height: 520px; overflow: auto; }
+  .notes-list li { padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .notes-list li:last-child { border-bottom: 0; }
+  .notes-list .d { font-size: 12px; color: var(--ink-3); }
+  .notes-list mark { background: color-mix(in srgb, var(--c4) 35%, transparent); color: inherit; border-radius: 3px; }
+  .seg { display: inline-flex; gap: 2px; background: var(--soft); border-radius: 10px; padding: 3px; flex-wrap: wrap; }
+  .seg button { border: 0; background: none; padding: 5px 10px; border-radius: 8px; cursor: pointer; color: var(--ink-2); font-size: 13px; }
+  .seg button.on { background: var(--surface); color: var(--ink); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+  .tbl-wrap { overflow-x: auto; margin: 0 -4px; }
+  table.tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .tbl th { text-align: left; font-size: 12px; font-weight: 600; color: var(--ink-3); padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  .tbl td { padding: 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .tbl td.n, .tbl th.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .tbl tr.click { cursor: pointer; }
+  .tbl tr.click:hover td { background: var(--soft); }
+  .tbl tr.open td { background: var(--soft); }
+  .tbl .nowrap { white-space: nowrap; }
+  .tbl .jr { color: var(--ink-2); min-width: 180px; }
+  .tbl .detail td { background: var(--soft); padding: 4px 8px 12px 28px; font-size: 13px; color: var(--ink-2); }
+  .tbl .detail ul { margin: 4px 0; padding-left: 16px; }
+  .mini { height: 6px; background: var(--soft); border-radius: 99px; overflow: hidden; min-width: 60px; }
+  .mini i { display: block; height: 100%; border-radius: 99px; }
+  .tag { display: inline-block; background: color-mix(in srgb, var(--c1) 14%, transparent); color: var(--ink); border-radius: 6px; padding: 0 5px; font-size: 13px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tagbtn { border: 1px solid var(--line); background: var(--surface); border-radius: 99px; padding: 4px 10px; cursor: pointer; font-size: 13px; }
+  .tagbtn b { font-variant-numeric: tabular-nums; margin-left: 4px; color: var(--ink-3); font-weight: 600; }
+  .tagbtn.on { background: var(--btn); color: var(--btn-ink); border-color: var(--btn); }
+  .tagbtn.on b { color: inherit; }
+  .filter-note { display: flex; gap: 8px; align-items: center; font-size: 13px; margin-bottom: 8px; }
+
+  #tip { position: fixed; z-index: 10; pointer-events: none; background: var(--btn); color: var(--btn-ink); font-size: 12px; padding: 6px 9px; border-radius: 8px; opacity: 0; transition: opacity .1s; max-width: 240px; line-height: 1.4; }
+  #tip.show { opacity: 1; }
+  .toasts { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); display: flex; flex-direction: column; gap: 8px; align-items: center; z-index: 20; width: calc(100% - 32px); pointer-events: none; }
+  .toast { background: var(--btn); color: var(--btn-ink); padding: 10px 16px; border-radius: 12px; font-size: 14px; animation: tin .25s ease-out; max-width: 460px; text-align: center; }
+  @keyframes tin { from { opacity: 0; transform: translateY(10px); } }
+  .burst { position: fixed; pointer-events: none; font-size: 22px; z-index: 30; animation: fly 1.1s ease-out forwards; }
+  @keyframes fly { to { transform: translate(var(--dx), var(--dy)) rotate(var(--r)); opacity: 0; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><h1>+1%</h1><span class="tagline">на 1% лучше, чем вчера</span></div>
+    <div class="row top-actions" style="align-items:center">
+      <!-- на телефоне вкладки становятся нижней панелью: значок + короткая подпись -->
+      <nav class="tabs" id="tabs">
+        <button data-act="view" data-v="today"><i>📅</i><span class="lf">Сегодня</span></button>
+        <button data-act="view" data-v="goals"><i>🎯</i><span class="lf">Цели</span></button>
+        <button data-act="view" data-v="progress"><i>📈</i><span class="lf">Прогресс</span></button>
+        <button data-act="view" data-v="report"><i>📋</i><span class="lf">Отчёт</span></button>
+        <button data-act="view" data-v="spheres"><i>🧭</i><span class="lf">Сферы</span></button>
+        <button data-act="view" data-v="awards"><i>🏅</i><span class="lf">Достижения</span><span class="ls">Награды</span></button>
+        <button data-act="view" data-v="settings"><i>⚙️</i><span class="lf">Настройки</span><span class="ls">Ещё</span></button>
+      </nav>
+      <button class="btn small primary" data-act="install" id="installBtn" hidden>📲 Установить</button>
+      <button class="icon-btn" data-act="theme" id="themeBtn" title="Тема"></button>
+    </div>
+  </header>
+  <main id="main"></main>
+</div>
+<div id="tip"></div>
+<div class="toasts" id="toasts"></div>
+
+<script>
+(() => {
+  const KEY = 'plusOnePercent.v1';
+
+  // ---------- даты ----------
+  const pad = (n) => String(n).padStart(2, '0');
+  const keyOf = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const dateOf = (k) => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
+  const addDays = (k, n) => { const d = dateOf(k); d.setDate(d.getDate() + n); return keyOf(d); };
+  const todayKey = () => keyOf(new Date());
+  const daysBetween = (a, b) => Math.round((dateOf(b) - dateOf(a)) / 86400000);
+  const fmtDay = (k, opts = { weekday: 'long', day: 'numeric', month: 'long' }) => dateOf(k).toLocaleDateString('ru-RU', opts);
+  const fmtShort = (k) => fmtDay(k, { day: 'numeric', month: 'short' });
+  const num = (x, d = 0) => x.toLocaleString('ru-RU', { minimumFractionDigits: d, maximumFractionDigits: d });
+  const signed = (x) => (x < 0 ? '−' + num(-x) : num(x));
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const uid = () => Math.random().toString(36).slice(2, 9);
+
+  // ---------- справочники ----------
+  const DEFAULT_SPHERES = [
+    { id: 'health', name: 'Здоровье', icon: '💪', slot: 1 },
+    { id: 'mind', name: 'Знания', icon: '🧠', slot: 2 },
+    { id: 'work', name: 'Работа', icon: '💼', slot: 3 },
+    { id: 'people', name: 'Близкие', icon: '❤️', slot: 4 },
+    { id: 'money', name: 'Финансы', icon: '💰', slot: 5 },
+    { id: 'soul', name: 'Осознанность', icon: '🧘', slot: 6 },
+    { id: 'create', name: 'Творчество', icon: '🛠️', slot: 7 },
+    { id: 'home', name: 'Быт', icon: '🏠', slot: 8 },
+  ];
+  // 4-й элемент: вопрос для заметки к привычке (пусто = без заметки)
+  const DEFAULT_HABITS = [
+    ['Зарядка 15 минут', 'health', 10, ''], ['8000 шагов', 'health', 10, ''], ['Лёг спать до 23:30', 'health', 10, ''], ['Выпил 2 л воды', 'health', 5, ''],
+    ['Читал 20 минут', 'mind', 10, 'Что читал? Какие мысли?'], ['Изучал новое 30 минут', 'mind', 15, 'Что узнал?'],
+    ['2 часа глубокой работы', 'work', 15, 'Над чем работал, что получилось?'], ['Разобрал входящие', 'work', 5, ''],
+    ['Позвонил или написал близкому', 'people', 10, 'Кому, о чём говорили?'],
+    ['Записал расходы', 'money', 5, ''],
+    ['Медитация 10 минут', 'soul', 10, 'Какие ощущения?'], ['Утро без соцсетей', 'soul', 10, ''],
+    ['Час на свой проект', 'create', 15, 'Что сделал в проекте?'],
+    ['15 минут порядка', 'home', 5, ''],
+  ].map(([name, sphere, xp, ask], i) => ({ id: 'h' + i, name, sphere, xp, ask, archived: false }));
+
+  // Срывы: [название, сфера, штраф XP, чем можно исправить (пусто = исправить нельзя)]
+  const DEFAULT_SETBACKS = [
+    ['Пропустил тренировку', 'health', 10, 'Сделал тренировку позже'],
+    ['Фастфуд или сладкое сверх меры', 'health', 5, ''],
+    ['Лёг спать после часа ночи', 'health', 10, ''],
+    ['Алкоголь или сигареты', 'health', 10, ''],
+    ['Взял деньги из копилки', 'money', 15, 'Вернул деньги в копилку'],
+    ['Импульсивная покупка', 'money', 10, 'Вернул или продал покупку'],
+    ['Залез в долг или кредит', 'money', 20, 'Погасил долг'],
+    ['Отложил важное дело на потом', 'work', 10, 'Всё-таки сделал в тот же день'],
+    ['Провалил дедлайн', 'work', 15, 'Доделал и договорился о новом сроке'],
+    ['Сорвался на близких', 'people', 10, 'Извинился и поговорил'],
+    ['Не сдержал обещание', 'people', 10, 'Выполнил или честно договорился заново'],
+    ['Больше 2 часов в соцсетях и роликах', 'soul', 10, ''],
+    ['Бросил начатое на полпути', 'create', 5, 'Вернулся и доделал'],
+    ['Оставил бардак на потом', 'home', 5, 'Убрал'],
+  ].map(([name, sphere, pen, fix], i) => ({ id: 's' + i, name, sphere, pen, fix, archived: false }));
+  const PENALTIES = [5, 10, 15, 20, 30];
+
+  const QUESTS = [
+    ['q1', 'Прогулка 20 минут без телефона', 'health'], ['q2', '10 минут растяжки', 'health'],
+    ['q3', 'Контрастный душ', 'health'], ['q4', 'Овощи к каждому приёму пищи', 'health'],
+    ['q5', 'Выучи 5 новых слов на иностранном языке', 'mind'], ['q6', 'Прочитай статью по своей специальности', 'mind'],
+    ['q7', 'Посмотри лекцию на новую для себя тему', 'mind'], ['q8', 'Сделай одно дело, которое давно откладывал', 'work'],
+    ['q9', 'Наведи порядок на рабочем столе и в файлах', 'work'], ['q10', 'Запиши 3 идеи, как улучшить свою работу', 'work'],
+    ['q11', 'Скажи кому-нибудь искреннее спасибо', 'people'], ['q12', 'Сделай кому-то приятное без повода', 'people'],
+    ['q13', 'Найди одну трату или подписку, от которой можно отказаться', 'money'], ['q14', 'Отложи немного денег', 'money'],
+    ['q15', 'Запиши 3 вещи, за которые благодарен', 'soul'], ['q16', '5 минут просто посиди в тишине', 'soul'],
+    ['q17', 'Вечером разбери день: что вышло, что нет', 'soul'], ['q18', 'Почини или доделай что-нибудь', 'create'],
+    ['q19', 'Набросай схему или эскиз новой идеи', 'create'], ['q20', 'Освой один новый приём в своём деле', 'create'],
+    ['q21', 'Выброси или отдай 5 ненужных вещей', 'home'], ['q22', 'Приготовь новое блюдо', 'home'],
+    ['q23', 'Разбери один ящик или полку', 'home'], ['q24', 'Пройди новым маршрутом', 'soul'],
+  ].map(([id, text, sphere]) => ({ id, text, sphere, xp: 15 }));
+  const QUEST_BY_ID = Object.fromEntries(QUESTS.map((q) => [q.id, q]));
+
+  const TITLES = ['Новичок', 'Ученик', 'Искатель', 'Практик', 'Подмастерье', 'Мастер', 'Эксперт', 'Наставник', 'Мудрец', 'Легенда'];
+  const ACTION_SIZES = [[5, 'мелочь'], [10, 'обычное дело'], [20, 'серьёзное'], [40, 'подвиг']];
+  const JOURNAL_XP = 5;
+  const NOTE_XP = 3;
+
+  // ---------- состояние ----------
+  const fresh = () => ({
+    v: 1, start: todayKey(),
+    settings: { minXP: 30 },
+    spheres: DEFAULT_SPHERES.map((s) => ({ ...s })),
+    habits: DEFAULT_HABITS.map((h) => ({ ...h })),
+    setbacks: DEFAULT_SETBACKS.map((s) => ({ ...s })),
+    goals: [], profile: { age: '', height: '', weight: '', wake: '07:00', bed: '23:30', sleepH: 8 },
+    days: {}, ach: {}
+  });
+  let state;
+  try { state = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+  if (!state || !state.days) state = fresh();
+  // дополнить данные, сохранённые старыми версиями (при загрузке и при импорте копии)
+  function migrate() {
+    // до появления заметок: подставить стандартные вопросы
+    state.habits.forEach((h) => {
+      if (h.ask === undefined) { const def = DEFAULT_HABITS.find((x) => x.id === h.id && x.name === h.name); h.ask = def ? def.ask : ''; }
+    });
+    if (!Array.isArray(state.setbacks)) state.setbacks = DEFAULT_SETBACKS.map((s) => ({ ...s }));
+    if (!Array.isArray(state.goals)) state.goals = [];
+    state.profile = { age: '', height: '', weight: '', wake: '07:00', bed: '23:30', sleepH: 8, ...(state.profile || {}) };
+  }
+  migrate();
+  const save = () => { calc = null; gcache = {}; try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
+
+  let view = 'today';
+  let viewDate = todayKey();
+  try { view = localStorage.getItem(KEY + '.view') || 'today'; } catch (e) {}
+
+  const sphere = (id) => state.spheres.find((s) => s.id === id) || { id, name: '—', icon: '•', slot: 1 };
+  const color = (id) => `var(--c${sphere(id).slot})`;
+  const habitById = (id) => state.habits.find((h) => h.id === id);
+  const day = (k) => state.days[k] || {};
+  const dayMut = (k) => (state.days[k] = state.days[k] || {});
+  // заметка к привычке учитывается, только если привычка отмечена в этот день
+  const noteOf = (d, id) => ((d.h || []).includes(id) ? ((d.n || {})[id] || '').trim() : '');
+  // срывы дня: d.s = { id: { fix: bool, note: '' } }
+  const sbById = (id) => state.setbacks.find((s) => s.id === id);
+  const sbList = (d) => Object.entries(d.s || {}).map(([id, r]) => ({ sb: sbById(id), r })).filter((x) => x.sb);
+  // штраф: полный; с разбором (записан вывод) вдвое меньше; исправлено — 0
+  const penOf = (sb, r) => (r.fix ? 0 : (r.note || '').trim() ? Math.ceil(sb.pen / 2) : sb.pen);
+
+  // ---------- цели ----------
+  // g = { id, type: 'time'|'sum'|'measure', title, sphere, start, days, from, to, unit, step, label, habit, status, log: { день: значение } }
+  // time: ступенчато сдвинуть время (from → to за days шагов), log[k] = true
+  // sum: накопить to единиц порциями step, log[k] = сумма за день
+  // measure: замер (вес и т. п.) от from к to к сроку, log[k] = значение
+  const GOAL_STEP_XP = 10, GOAL_LOG_XP = 5, GOAL_DONE_XP = 50;
+  const MEDALS = { gold: ['🥇', 'в срок'], silver: ['🥈', 'с небольшим опозданием'], bronze: ['🥉', 'с опозданием'] };
+  // время до полудня считаем «после полуночи», чтобы 23:30 → 00:30 было движением вперёд
+  const toMin = (s) => { const m = /^(\d{1,2}):(\d{2})$/.exec(String(s || '').trim()); if (!m || +m[1] > 23 || +m[2] > 59) return null; const v = +m[1] * 60 + +m[2]; return v < 720 ? v + 1440 : v; };
+  const fmtMin = (v) => { const m = ((Math.round(v) % 1440) + 1440) % 1440; return `${pad(Math.floor(m / 60))}:${pad(m % 60)}`; };
+  const fmtNum = (v) => num(v, Number.isInteger(v) ? 0 : 1);
+  const goalById = (id) => state.goals.find((g) => g.id === id);
+  const goalStepVal = (g, i) => toMin(g.from) + (toMin(g.to) - toMin(g.from)) * i / g.days; // время на шаге i (1..days)
+  const goalPlanVal = (g, k) => g.from + (g.to - g.from) * Math.min(1, Math.max(0, daysBetween(g.start, k)) / Math.max(1, g.days - 1));
+  const goalStepText = (g, val) => (g.label || '').replace('{v}', val);
+
+  let gcache = {};
+  function goalInfo(g) {
+    if (gcache[g.id]) return gcache[g.id];
+    const t = todayKey(), N = Math.max(1, g.days), log = g.log || {};
+    const keys = Object.keys(log).filter((k) => k >= g.start && k <= t).sort();
+    const planEnd = addDays(g.start, N - 1), todayDone = log[t] !== undefined && log[t] !== false;
+    let progress = 0, doneAt = null, cur = null, expEnd = null, steps = 0;
+    const nextStart = todayDone ? addDays(t, 1) : t;
+    if (g.type === 'time') {
+      for (const k of keys) { if (!log[k]) continue; steps++; if (steps === N) { doneAt = k; break; } }
+      progress = steps / N;
+      if (!doneAt) expEnd = addDays(nextStart, N - steps - 1);
+    } else if (g.type === 'sum') {
+      cur = 0;
+      for (const k of keys) { if (!(log[k] > 0)) continue; cur += log[k]; steps++; if (!doneAt && cur >= g.to) doneAt = k; }
+      progress = Math.min(1, cur / g.to);
+      if (!doneAt) expEnd = addDays(nextStart, Math.ceil((g.to - cur) / g.step) - 1);
+    } else {
+      cur = g.from;
+      const dir = Math.sign(g.to - g.from) || 1;
+      for (const k of keys) {
+        const v = Number(log[k]); if (!isFinite(v)) continue;
+        cur = v; steps++;
+        if (!doneAt && (v - g.to) * dir >= 0) doneAt = k;
+      }
+      progress = Math.max(0, Math.min(1, (cur - g.from) / (g.to - g.from)));
+      if (!doneAt && steps) {
+        const rate = (cur - g.from) / Math.max(1, daysBetween(g.start, keys[keys.length - 1]));
+        if (rate * dir > 0) expEnd = addDays(t, Math.ceil((g.to - cur) / rate));
+      }
+    }
+    if (doneAt) progress = 1;
+    const end = doneAt || expEnd;
+    const shift = end ? daysBetween(planEnd, end) : null;
+    const medal = doneAt ? (shift <= 0 ? 'gold' : shift <= Math.max(1, Math.round(N * 0.2)) ? 'silver' : 'bronze') : null;
+    return (gcache[g.id] = { progress, doneAt, cur, planEnd, expEnd, shift, steps, todayDone, medal, active: g.status !== 'dropped' && !doneAt });
+  }
+
+  // XP от целей за день: шаг или замер, плюс бонус в день достижения
+  function goalXP(k) {
+    const out = [];
+    state.goals.forEach((g) => {
+      if (k < g.start) return;
+      const v = (g.log || {})[k];
+      const did = g.type === 'measure' ? isFinite(Number(v)) && v !== undefined && v !== '' : g.type === 'sum' ? v > 0 : !!v;
+      if (did) out.push({ sphere: g.sphere, xp: g.type === 'measure' ? GOAL_LOG_XP : GOAL_STEP_XP, step: true });
+      if (goalInfo(g).doneAt === k) out.push({ sphere: g.sphere, xp: GOAL_DONE_XP, step: false });
+    });
+    return out;
+  }
+
+  // ---------- расчёты ----------
+  function baseBy(k) {
+    const d = day(k), by = {};
+    const add = (s, v) => { by[s] = (by[s] || 0) + v; };
+    (d.h || []).forEach((id) => { const h = habitById(id); if (h) add(h.sphere, h.xp + (noteOf(d, id) ? NOTE_XP : 0)); });
+    (d.q || []).forEach((id) => { const q = QUEST_BY_ID[id]; if (q) add(q.sphere, q.xp); });
+    (d.a || []).forEach((a) => add(a.sphere, a.xp));
+    if ((d.j || '').trim()) add('soul', JOURNAL_XP);
+    sbList(d).forEach(({ sb, r }) => add(sb.sphere, -penOf(sb, r)));
+    goalXP(k).forEach((x) => add(x.sphere, x.xp));
+    return by;
+  }
+
+  // Самая отстающая сфера за 7 предыдущих дней: её привычки дают ×2
+  function focusSphere(k) {
+    const active = state.spheres.filter((s) => state.habits.some((h) => !h.archived && h.sphere === s.id));
+    if (!active.length) return null;
+    const sum = {}; let total = 0;
+    for (let i = 1; i <= 7; i++) {
+      const by = baseBy(addDays(k, -i));
+      for (const s in by) { sum[s] = (sum[s] || 0) + by[s]; total += by[s]; }
+    }
+    if (!total) return null;
+    let best = null;
+    active.forEach((s) => { if (best === null || (sum[s.id] || 0) < (sum[best] || 0)) best = s.id; });
+    return best;
+  }
+
+  function dayCalc(k) {
+    const d = day(k), focus = focusSphere(k), by = {};
+    let xp = 0, count = 0;
+    const add = (s, v) => { by[s] = (by[s] || 0) + v; xp += v; };
+    (d.h || []).forEach((id) => {
+      const h = habitById(id);
+      if (h) { add(h.sphere, h.xp * (h.sphere === focus ? 2 : 1) + (noteOf(d, id) ? NOTE_XP : 0)); count++; }
+    });
+    (d.q || []).forEach((id) => { const q = QUEST_BY_ID[id]; if (q) { add(q.sphere, q.xp); count++; } });
+    (d.a || []).forEach((a) => { add(a.sphere, a.xp); count++; });
+    if ((d.j || '').trim()) add('soul', JOURNAL_XP);
+    goalXP(k).forEach((x) => { add(x.sphere, x.xp); if (x.step) count++; });
+    let pen = 0, sb = 0;
+    sbList(d).forEach(({ sb: s, r }) => { const p = penOf(s, r); add(s.sphere, -p); pen += p; sb++; });
+    // срывы перевесили всё хорошее → спад; хоть что-то отмечено → удержание
+    const status = d.rest ? 'rest' : xp >= state.settings.minXP ? 'grow' : xp < 0 ? 'miss' : (xp > 0 || count || sb) ? 'hold' : 'miss';
+    return { xp, by, count, focus, status, pen, sb };
+  }
+
+  const levelOf = (xp) => { let n = 1; while (xp >= 50 * n * (n + 1)) n++; return { lvl: n, from: 50 * (n - 1) * n, to: 50 * n * (n + 1) }; };
+  const sphereLevel = (xp) => { const lvl = Math.floor(Math.sqrt(Math.max(0, xp) / 25)) + 1; return { lvl, from: 25 * (lvl - 1) ** 2, to: 25 * lvl ** 2 }; };
+  const title = (lvl) => TITLES[Math.min(lvl, TITLES.length) - 1];
+
+  let calc = null;
+  function all() {
+    if (calc) return calc;
+    const t = todayKey();
+    if (state.start > t) state.start = t;
+    const tl = [], days = {};
+    let idx = 1, streak = 0, best = 0, totalXP = 0, actions = 0, grow = 0, miss = 0, rest = 0, records = 0, tracked = 0, bestDay = null;
+    const sphereXP = {}, sbLast = {};
+    let prevXP = 0, sbCount = 0, sbFixed = 0, sbLost = 0, clean = 0, bestClean = 0;
+    for (let k = state.start; k <= t; k = addDays(k, 1)) {
+      const c = dayCalc(k); days[k] = c;
+      const recs = sbList(day(k));
+      recs.forEach(({ sb, r }) => { sbCount++; if (r.fix) sbFixed++; sbLast[sb.id] = k; });
+      sbLost += c.pen;
+      clean = recs.some(({ r }) => !r.fix) ? 0 : clean + 1;
+      bestClean = Math.max(bestClean, clean);
+      totalXP += c.xp; actions += c.count;
+      for (const s in c.by) sphereXP[s] = (sphereXP[s] || 0) + c.by[s];
+      if (c.xp > 0) tracked++;
+      if (!bestDay || c.xp > bestDay.xp) bestDay = { k, xp: c.xp };
+      const isToday = k === t;
+      if (c.status === 'grow') { idx *= 1.01; streak++; grow++; if (prevXP > 0 && c.xp > prevXP) records++; }
+      else if (c.status === 'rest') rest++;
+      else if (!isToday) { streak = 0; if (c.status === 'miss') { idx *= 0.99; miss++; } }
+      best = Math.max(best, streak);
+      prevXP = c.xp;
+      tl.push({ k, idx, status: c.status, xp: c.xp });
+    }
+    const journal = Object.entries(state.days).filter(([, d]) => (d.j || '').trim()).sort((a, b) => b[0].localeCompare(a[0]));
+    const quests = Object.values(state.days).reduce((s, d) => s + (d.q || []).length, 0);
+    const sphereLv = state.spheres.map((s) => sphereLevel(sphereXP[s.id] || 0).lvl);
+    const ginfo = state.goals.map(goalInfo);
+    const goalsDone = ginfo.filter((x) => x.doneAt).length, goalsOnTime = ginfo.filter((x) => x.medal === 'gold').length;
+    calc = {
+      tl, days, idx, streak, best, totalXP, actions, grow, miss, rest, records, tracked, bestDay, sphereXP, journal, quests,
+      sbCount, sbFixed, sbLost, sbLast, clean, bestClean, goalsDone, goalsOnTime,
+      level: levelOf(totalXP), minSphereLv: Math.min(...sphereLv), dayNo: daysBetween(state.start, t) + 1
+    };
+    return calc;
+  }
+  const calcFor = (k) => all().days[k] || dayCalc(k);
+
+  // ---------- достижения ----------
+  const ACH = [
+    ['first', '🌱', 'Первый шаг', 'Первый день роста', (a) => [a.grow, 1]],
+    ['s3', '🔥', 'Разогрев', 'Серия роста 3 дня', (a) => [a.best, 3]],
+    ['s7', '🗓️', 'Неделя', 'Серия роста 7 дней', (a) => [a.best, 7]],
+    ['s30', '🌕', 'Месяц силы', 'Серия роста 30 дней', (a) => [a.best, 30]],
+    ['s100', '💯', 'Сотня', 'Серия роста 100 дней', (a) => [a.best, 100]],
+    ['i105', '📈', 'Плюс пять', 'Индекс ×1,05', (a) => [Math.round((a.idx - 1) * 100), 5]],
+    ['i110', '🚀', 'Плюс десять', 'Индекс ×1,10', (a) => [Math.round((a.idx - 1) * 100), 10]],
+    ['i150', '🦅', 'В полтора раза', 'Индекс ×1,50', (a) => [Math.round((a.idx - 1) * 100), 50]],
+    ['i200', '👑', 'Вдвое лучше', 'Индекс ×2,00', (a) => [Math.round((a.idx - 1) * 100), 100]],
+    ['rec5', '🥇', 'Обогнал себя', '5 дней лучше вчерашнего', (a) => [a.records, 5]],
+    ['rec25', '🏆', 'Сам себе соперник', '25 дней лучше вчерашнего', (a) => [a.records, 25]],
+    ['act100', '🧱', 'Сто кирпичиков', '100 полезных действий', (a) => [a.actions, 100]],
+    ['act1000', '🏰', 'Крепость', '1000 полезных действий', (a) => [a.actions, 1000]],
+    ['j10', '📓', 'Летописец', '10 записей в дневнике', (a) => [a.journal.length, 10]],
+    ['j50', '📚', 'Хроники', '50 записей в дневнике', (a) => [a.journal.length, 50]],
+    ['q10', '🗺️', 'Искатель приключений', '10 заданий дня', (a) => [a.quests, 10]],
+    ['q50', '⚔️', 'Герой', '50 заданий дня', (a) => [a.quests, 50]],
+    ['lv5', '⭐', 'Уровень 5', 'Достичь 5-го уровня', (a) => [a.level.lvl, 5]],
+    ['lv10', '🌟', 'Уровень 10', 'Достичь 10-го уровня', (a) => [a.level.lvl, 10]],
+    ['bal', '☯️', 'Гармония', 'Все сферы на 3-м уровне', (a) => [a.minSphereLv, 3]],
+    ['honest', '🪞', 'Честный счёт', 'Записать 10 срывов', (a) => [a.sbCount, 10]],
+    ['fix10', '🔁', 'Работа над ошибками', 'Исправить 10 срывов', (a) => [a.sbFixed, 10]],
+    ['clean7', '🛡️', 'Чистая неделя', '7 дней подряд без срывов', (a) => [a.bestClean, 7]],
+    ['clean30', '🏛️', 'Чистый месяц', '30 дней подряд без срывов', (a) => [a.bestClean, 30]],
+    ['goal1', '🎯', 'В яблочко', 'Достичь первой цели', (a) => [a.goalsDone, 1]],
+    ['goal5', '🏹', 'Снайпер', 'Достичь 5 целей', (a) => [a.goalsDone, 5]],
+    ['goalT3', '⏱️', 'Точно в срок', '3 цели достигнуты в срок', (a) => [a.goalsOnTime, 3]],
+  ];
+  function checkAch(silent) {
+    const a = all(), fresh = [];
+    ACH.forEach(([id, ic, nm, , fn]) => {
+      const [cur, need] = fn(a);
+      if (cur >= need && !state.ach[id]) { state.ach[id] = todayKey(); fresh.push(`${ic} ${nm}`); }
+    });
+    if (fresh.length) {
+      try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+      if (!silent) toast(`🏅 Новое достижение: ${fresh[0]}${fresh.length > 1 ? ` и ещё ${fresh.length - 1}` : ''}`);
+    }
+  }
+
+  // ---------- эффекты ----------
+  function toast(msg) {
+    const el = document.createElement('div');
+    el.className = 'toast'; el.textContent = msg;
+    document.getElementById('toasts').appendChild(el);
+    setTimeout(() => el.remove(), 3600);
+  }
+  function burst(x, y, chars = ['✨', '⭐', '🎉', '💫']) {
+    for (let i = 0; i < 14; i++) {
+      const s = document.createElement('div');
+      s.className = 'burst'; s.textContent = chars[i % chars.length];
+      s.style.left = x + 'px'; s.style.top = y + 'px';
+      const a = Math.random() * Math.PI * 2, r = 60 + Math.random() * 90;
+      s.style.setProperty('--dx', Math.cos(a) * r + 'px');
+      s.style.setProperty('--dy', Math.sin(a) * r - 40 + 'px');
+      s.style.setProperty('--r', (Math.random() * 360 - 180) + 'deg');
+      document.body.appendChild(s);
+      setTimeout(() => s.remove(), 1200);
+    }
+  }
+
+  const tip = document.getElementById('tip');
+  function showTip(html, x, y) {
+    tip.innerHTML = html; tip.classList.add('show');
+    const w = tip.offsetWidth, h = tip.offsetHeight;
+    tip.style.left = Math.min(window.innerWidth - w - 8, Math.max(8, x + 12)) + 'px';
+    tip.style.top = (y - h - 12 < 8 ? y + 16 : y - h - 12) + 'px';
+  }
+  const hideTip = () => tip.classList.remove('show');
+  document.addEventListener('pointerover', (e) => {
+    const el = e.target.closest('[data-tip]');
+    if (el) { const r = el.getBoundingClientRect(); showTip(el.dataset.tip, r.left + r.width / 2, r.top); }
+  });
+  document.addEventListener('pointerout', (e) => { if (e.target.closest('[data-tip]')) hideTip(); });
+
+  // ---------- виды ----------
+  const statusPill = (k, c, yXP) => {
+    const isToday = k === todayKey();
+    if (c.status === 'rest') return `<span class="pill">🛌 День восстановления: индекс и серия сохраняются</span>`;
+    if (c.status === 'grow') {
+      return yXP > 0 && c.xp > yXP
+        ? `<span class="pill good">🏆 +1% и рекорд: лучше, чем вчера</span>`
+        : `<span class="pill good">✅ +1% засчитан</span>`;
+    }
+    if (isToday) return `<span class="pill">⏳ Ещё ${state.settings.minXP - c.xp} XP до +1%</span>`;
+    if (c.status === 'hold') return `<span class="pill">➖ Удержание: индекс не изменился</span>`;
+    return c.pen
+      ? `<span class="pill bad">🔻 Спад −1%: срывы перевесили</span>`
+      : `<span class="pill bad">🔻 Спад −1%: день без действий</span>`;
+  };
+
+  function kpis() {
+    const a = all(), pct = (a.idx - 1) * 100, L = a.level;
+    const span = L.to - L.from;
+    return `<div class="kpis">
+      <div class="kpi"><div class="kpi-l">Индекс роста</div><div class="kpi-v">×${num(a.idx, 3)}</div>
+        <div class="kpi-s ${pct > 0 ? 'up' : pct < 0 ? 'down' : ''}">${pct >= 0 ? '+' : ''}${num(pct, 1)}% с начала пути</div></div>
+      <div class="kpi"><div class="kpi-l">Серия роста</div><div class="kpi-v">🔥 ${a.streak}</div><div class="kpi-s">лучшая: ${a.best}</div></div>
+      <div class="kpi"><div class="kpi-l">Уровень ${L.lvl} · ${title(L.lvl)}</div><div class="kpi-v">${num(a.totalXP)} XP</div>
+        <div class="bar"><i style="width:${Math.max(0, (a.totalXP - L.from) / span) * 100}%"></i></div><div class="kpi-s">ещё ${num(L.to - a.totalXP)} XP до ${L.lvl + 1}-го</div></div>
+      <div class="kpi"><div class="kpi-l">Путь</div><div class="kpi-v">День ${a.dayNo}</div><div class="kpi-s">роста ${a.grow} · спадов ${a.miss}</div></div>
+    </div>`;
+  }
+
+  function viewToday() {
+    const k = viewDate, t = todayKey(), d = day(k), c = calcFor(k);
+    const yk = addDays(k, -1), yc = k > state.start ? calcFor(yk) : { xp: 0 };
+    const minK = addDays(t, -30);
+    const max = Math.max(c.xp, yc.xp, state.settings.minXP) * 1.15;
+    const minPos = (state.settings.minXP / max) * 100;
+    const label = k === t ? `Сегодня, ${fmtDay(k, { day: 'numeric', month: 'long' })}` : k === addDays(t, -1) ? `Вчера, ${fmtDay(k, { day: 'numeric', month: 'long' })}` : fmtDay(k);
+    const isPast = k < t;
+
+    // привычки по сферам
+    const groups = state.spheres.map((s) => {
+      const hs = state.habits.filter((h) => !h.archived && h.sphere === s.id);
+      if (!hs.length) return '';
+      const sl = sphereLevel(all().sphereXP[s.id] || 0).lvl;
+      const x2 = c.focus === s.id;
+      return `<div class="sphere-group">
+        <div class="sphere-head"><span class="sw" style="background:${color(s.id)}"></span>${s.icon} ${esc(s.name)} ${x2 ? '<span class="x2">×2 XP</span>' : ''}<span class="lv">ур. ${sl}</span></div>
+        <div class="chips">${hs.map((h) => {
+          const on = (d.h || []).includes(h.id);
+          return `<button class="chip${on ? ' on' : ''}" data-act="habit" data-id="${h.id}"><span class="box"></span>${esc(h.name)}${on && noteOf(d, h.id) ? ' <span title="Есть заметка">✎</span>' : ''}<span class="xp">+${h.xp * (x2 ? 2 : 1)}</span></button>`;
+        }).join('')}</div>
+        ${hs.filter((h) => h.ask && (d.h || []).includes(h.id)).map((h) => `<label class="note">
+          <span class="note-q">${esc(h.name)}: <b>${esc(h.ask)}</b> <span class="muted">+${NOTE_XP} XP</span></span>
+          <textarea rows="2" data-field="note" data-id="${h.id}" placeholder="Пара строк для себя, можно с #тегами">${esc((d.n || {})[h.id] || '')}</textarea>
+        </label>`).join('')}</div>`;
+    }).join('');
+
+    const qs = pickQuests(k);
+    const anyQuest = (d.q || []).length > 0;
+    const quests = qs.map((q) => {
+      const on = (d.q || []).includes(q.id), s = sphere(q.sphere);
+      return `<div class="quest"><button class="chip${on ? ' on' : ''}" data-act="quest" data-id="${q.id}"><span class="box"></span>
+        <span><span class="t">${esc(q.text)}</span><br><span class="xp">${s.icon} ${esc(s.name)} · +${q.xp} XP</span></span></button></div>`;
+    }).join('');
+
+    const logs = (d.a || []).map((a) => {
+      const s = sphere(a.sphere);
+      return `<li><span class="sw" style="background:${color(a.sphere)}"></span><span class="t">${esc(a.text)}</span><span class="muted">${s.icon} +${a.xp}</span><button class="x" data-act="delAction" data-id="${a.id}" aria-label="Удалить">×</button></li>`;
+    }).join('');
+
+    const restUsed = restCount(k);
+    const restAllowed = d.rest || restUsed < 1;
+
+    return kpis() + `<div class="grid g2">
+      <section class="card">
+        <div class="datenav">
+          <button data-act="prev" ${k <= minK ? 'disabled' : ''} aria-label="Предыдущий день">‹</button>
+          <b>${label}</b>
+          ${k !== t ? '<button class="back-today" data-act="today">к сегодня</button>' : ''}
+          <button data-act="next" ${k >= t ? 'disabled' : ''} aria-label="Следующий день">›</button>
+        </div>
+        <h2>Вы против вчерашнего себя</h2>
+        <div class="duel-row"><span class="who">Вчера</span><div class="track"><div class="fill" style="width:${Math.max(0, yc.xp / max) * 100}%"></div><div class="min" style="left:${minPos}%"></div></div><span class="val">${signed(yc.xp)} XP</span></div>
+        <div class="duel-row"><span class="who">${k === t ? 'Сегодня' : 'Этот день'}</span><div class="track"><div class="fill me" style="width:${Math.max(0, c.xp / max) * 100}%"></div><div class="min" style="left:${minPos}%"></div></div><span class="val">${signed(c.xp)} XP</span></div>
+        <div class="min-note">Пунктир показывает минимум дня (${state.settings.minXP} XP). Набрали его, и индекс растёт на 1%.</div>
+        ${c.pen ? `<div class="min-note" style="color:var(--bad)">🔻 Срывы отняли ${c.pen} XP${k === t ? '. Разбор уменьшит штраф вдвое, исправление снимет его.' : ''}</div>` : ''}
+        ${statusPill(k, c, yc.xp)}
+        ${c.status !== 'grow' && c.status !== 'rest' && yc.xp > 0 && c.xp <= yc.xp ? `<div class="min-note" style="margin-top:6px">До рекорда над вчерашним днём: ещё ${yc.xp - c.xp + 1} XP</div>` : ''}
+        ${c.focus ? `<div class="focus-banner">🎯 <b>Сфера-фокус: ${sphere(c.focus).icon} ${esc(sphere(c.focus).name)}</b>. За прошлую неделю она отстала от остальных, поэтому её привычки сегодня приносят ×2 XP.</div>` : ''}
+      </section>
+
+      <section class="card">
+        <h2>Задания дня</h2>
+        <p class="lead">Три маленьких испытания, каждое день новое. По +15 XP за каждое.</p>
+        ${quests}
+        ${!anyQuest && !(d.reroll >= 1) ? `<button class="btn small" data-act="reroll" style="margin-top:8px">🎲 Другие задания (1 раз в день)</button>` : ''}
+      </section>
+
+      ${goalsToday(k)}
+
+      <section class="card wide">
+        <h2>Привычки</h2>
+        <p class="lead">Отмечайте, что сделали${isPast ? ' в этот день' : ' сегодня'}. Список настраивается во вкладке «Настройки».</p>
+        ${groups || '<p class="muted">Активных привычек нет. Добавьте их в настройках.</p>'}
+      </section>
+
+      <section class="card wide">
+        <div class="row" style="justify-content:space-between;align-items:baseline">
+          <h2>🔻 Срывы и откаты</h2>
+          <span class="muted" style="font-size:13px">🛡️ Без срывов: <b style="color:var(--ink)">${all().clean}</b> дн. подряд · рекорд ${all().bestClean}</span>
+        </div>
+        <p class="lead">Отмечайте честно, что откатило назад: срыв отнимает XP. Разбор «что случилось» уменьшает штраф вдвое, исправление снимает его полностью.</p>
+        ${sbChips(k, d)}
+        ${sbRecords(d)}
+      </section>
+
+      <section class="card">
+        <h2>Любое полезное дело</h2>
+        <p class="lead">Сделали что-то вне списка? Запишите, оно тоже считается.</p>
+        <form class="row" id="actionForm">
+          <input type="text" id="aText" placeholder="Например: починил розетку" maxlength="120" style="flex:1 1 200px">
+          <select id="aSphere">${state.spheres.map((s) => `<option value="${s.id}">${s.icon} ${esc(s.name)}</option>`).join('')}</select>
+          <select id="aXP">${ACTION_SIZES.map(([v, n]) => `<option value="${v}"${v === 10 ? ' selected' : ''}>+${v} · ${n}</option>`).join('')}</select>
+          <button class="btn primary" type="submit">Записать</button>
+        </form>
+        ${logs ? `<ul class="logs">${logs}</ul>` : ''}
+      </section>
+
+      <section class="card">
+        <h2>В чём я стал на 1% лучше?</h2>
+        <p class="lead">Одна мысль или вывод за день. Запись даёт +${JOURNAL_XP} XP к осознанности. Добавляйте #теги, по ним во вкладке «Отчёт» строится сводка.</p>
+        <textarea data-field="journal" placeholder="Например: спокойно выслушал критику и не спорил #терпение">${esc(d.j || '')}</textarea>
+        ${(() => {
+          const used = tagsOf(d.j), sug = allTags().filter((tg) => !used.includes(tg)).slice(0, 8);
+          return sug.length ? `<div class="tags" style="margin-top:6px"><span class="muted" style="font-size:12px">Ваши теги:</span>${sug.map((tg) => `<button class="tagbtn" data-act="addTag" data-tag="${esc(tg)}">${esc(tg)}</button>`).join('')}</div>` : '';
+        })()}
+        <div class="row" style="margin-top:10px;align-items:center">
+          <button class="btn small" data-act="rest" ${restAllowed ? '' : 'disabled'}>${d.rest ? '↩ Отменить день восстановления' : '🛌 Сделать днём восстановления'}</button>
+          <span class="muted" style="font-size:12px">Болезнь, дорога, отдых: индекс и серия не страдают. Не чаще 1 раза в 7 дней.</span>
+        </div>
+      </section>
+    </div>`;
+  }
+
+  // строка про срок: план, прогноз и сдвиг
+  function goalTermText(g, info) {
+    if (info.doneAt) {
+      const [ic, txt] = MEDALS[info.medal];
+      return `${ic} Достигнута ${fmtShort(info.doneAt)} (${txt}${info.shift > 0 ? `, +${info.shift} дн.` : ''})`;
+    }
+    if (!info.expEnd) return `План: ${fmtShort(info.planEnd)} · прогноз появится после первых замеров`;
+    const sh = info.shift;
+    const s = sh > 0 ? ` <span class="late">+${sh} дн.</span>` : sh < 0 ? ` <span class="early">на ${-sh} дн. раньше</span>` : ' · в срок';
+    return `План: ${fmtShort(info.planEnd)} · прогноз: ${fmtShort(info.expEnd)}${s}`;
+  }
+
+  function goalsToday(k) {
+    const items = state.goals.filter((g) => g.status !== 'dropped' && k >= g.start)
+      .map((g) => ({ g, info: goalInfo(g) }))
+      .filter(({ info }) => !(info.doneAt && info.doneAt < k));
+    if (!items.length) return '';
+    const rows = items.map(({ g, info }) => {
+      const v = (g.log || {})[k], s = sphere(g.sphere);
+      const bar = `<div class="bar"><i style="width:${info.progress * 100}%;background:${color(g.sphere)}"></i></div>`;
+      let task;
+      if (g.type === 'measure') {
+        const plan = goalPlanVal(g, k), dir = g.to < g.from ? '≤' : '≥';
+        task = `<label class="goal-measure">${s.icon} ${esc(goalStepText(g, '') || 'Замер')}:
+          <input type="text" inputmode="decimal" data-field="goalval" data-id="${g.id}" value="${v !== undefined ? fmtNum(Number(v)) : ''}" placeholder="${fmtNum(info.cur)}"> ${esc(g.unit)}
+          <span class="muted">план на этот день ${dir} ${fmtNum(Math.round(plan * 10) / 10)} · +${GOAL_LOG_XP} XP</span></label>`;
+      } else {
+        const on = g.type === 'sum' ? v > 0 : !!v;
+        let text, stepNo;
+        if (g.type === 'time') {
+          // шаг этого дня: сколько шагов сделано до него + 1
+          stepNo = Object.keys(g.log || {}).filter((x) => x >= g.start && x < k && g.log[x]).length + 1;
+          text = goalStepText(g, fmtMin(goalStepVal(g, Math.min(stepNo, g.days))));
+        } else {
+          text = goalStepText(g, fmtNum(g.step) + ' ' + g.unit);
+        }
+        task = `<button class="chip goal${on ? ' on' : ''}" data-act="goalStep" data-id="${g.id}"><span class="box"></span>${s.icon} ${esc(text)}
+          <span class="xp">${g.type === 'time' ? `шаг ${Math.min(stepNo, g.days)} из ${g.days} · ` : ''}+${GOAL_STEP_XP}</span></button>`;
+      }
+      return `<div class="goal-row">
+        <div class="goal-title"><b>${esc(g.title)}</b><span class="muted">${goalProgressText(g, info)}</span></div>
+        ${bar}${task}
+        <div class="goal-term">${goalTermText(g, info)}</div>
+      </div>`;
+    }).join('');
+    return `<section class="card wide goals-today">
+      <h2>🎯 Обязательные задания по целям</h2>
+      <p class="lead">Пропустили шаг — срок цели сдвигается на день. У замеров срок фиксированный, а прогноз считается по вашему темпу.
+        Шаг даёт +${GOAL_STEP_XP} XP, замер +${GOAL_LOG_XP}, достижение цели +${GOAL_DONE_XP} XP и медаль.</p>
+      ${rows}
+    </section>`;
+  }
+
+  // что сделано по целям в день k (для отчёта и CSV), обычный текст
+  function goalDayLines(k) {
+    const out = [];
+    state.goals.forEach((g) => {
+      const v = (g.log || {})[k];
+      if (k < g.start || v === undefined || v === false) return;
+      if (g.type === 'time') {
+        const stepNo = Object.keys(g.log).filter((x) => x >= g.start && x < k && g.log[x]).length + 1;
+        out.push(`${g.title}: ${goalStepText(g, fmtMin(goalStepVal(g, Math.min(stepNo, g.days))))} (шаг ${Math.min(stepNo, g.days)} из ${g.days})`);
+      } else if (g.type === 'sum') out.push(`${g.title}: +${fmtNum(v)} ${g.unit}`);
+      else out.push(`${g.title}: ${g.label || 'замер'} ${fmtNum(Number(v))} ${g.unit}`);
+      if (goalInfo(g).doneAt === k) out.push(`${g.title}: цель достигнута ${MEDALS[goalInfo(g).medal].join(' ')}`);
+    });
+    return out;
+  }
+
+  function goalProgressText(g, info) {
+    if (g.type === 'time') {
+      const now = info.steps ? fmtMin(goalStepVal(g, Math.min(info.steps, g.days))) : g.from;
+      return `${g.from} → сейчас ${now} → цель ${g.to}`;
+    }
+    if (g.type === 'sum') return `${fmtNum(info.cur)} из ${fmtNum(g.to)} ${g.unit}`;
+    return `${fmtNum(g.from)} → сейчас ${fmtNum(info.cur)} → цель ${fmtNum(g.to)} ${g.unit}`;
+  }
+
+  // сколько дней прошло без этого срыва (по сегодняшний день)
+  function sbDaysWithout(sb) {
+    const a = all(), last = a.sbLast[sb.id];
+    return last ? daysBetween(last, todayKey()) : a.dayNo;
+  }
+
+  function sbChips(k, d) {
+    const recs = d.s || {};
+    const list = state.setbacks.filter((s) => !s.archived || recs[s.id]);
+    if (!list.length) return '<p class="muted">Список срывов пуст. Его можно настроить в «Настройках».</p>';
+    const order = Object.fromEntries(state.spheres.map((s, i) => [s.id, i]));
+    const any = Object.keys(recs).length > 0;
+    return `<details class="sb-list"${any ? ' open' : ''}><summary>Отметить срыв (${list.length})</summary><div class="chips" style="margin-top:8px">${[...list].sort((x, y) => order[x.sphere] - order[y.sphere]).map((sb) => {
+      const on = !!recs[sb.id], w = sbDaysWithout(sb);
+      const without = on ? '' : ` · ${w ? w + ' дн. без' : 'было сегодня'}`;
+      return `<button class="chip sb${on ? ' on' : ''}" data-act="sb" data-id="${sb.id}"><span class="box"></span>${sphere(sb.sphere).icon} ${esc(sb.name)}<span class="xp">−${sb.pen}${without}</span></button>`;
+    }).join('')}</div></details>`;
+  }
+
+  function sbRecords(d) {
+    return sbList(d).map(({ sb, r }) => {
+      const p = penOf(sb, r);
+      const state_ = r.fix ? '✓ исправлено, штраф снят' : (r.note || '').trim() ? 'разобрано, штраф уменьшен вдвое' : 'полный штраф';
+      return `<div class="sb-rec">
+        <div class="sb-head"><b>${sphere(sb.sphere).icon} ${esc(sb.name)}</b><span class="pen">${p ? '−' + p : '0'} XP</span><span class="muted">${state_}</span></div>
+        <textarea rows="2" data-field="sbnote" data-id="${sb.id}" placeholder="Разбор: что случилось? Что сделаю иначе в следующий раз? (штраф ×½)">${esc(r.note || '')}</textarea>
+        ${sb.fix ? `<button class="btn small${r.fix ? ' primary' : ''}" data-act="sbFix" data-id="${sb.id}" style="margin-top:6px">${r.fix ? '✓ ' : '🔁 '}${esc(sb.fix)}</button>` : ''}
+      </div>`;
+    }).join('');
+  }
+
+  function restCount(k) {
+    let n = 0;
+    for (let i = 1; i <= 6; i++) if (day(addDays(k, -i)).rest) n++;
+    for (let i = 1; i <= 6; i++) if (day(addDays(k, i)).rest) n++;
+    return n;
+  }
+
+  // детерминированный выбор заданий по дате
+  function rng(seed) {
+    let h = 1779033703 ^ seed.length;
+    for (let i = 0; i < seed.length; i++) { h = Math.imul(h ^ seed.charCodeAt(i), 3432918353); h = (h << 13) | (h >>> 19); }
+    return () => { h = Math.imul(h ^ (h >>> 16), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909); return ((h ^= h >>> 16) >>> 0) / 4294967296; };
+  }
+  function pickQuests(k) {
+    const r = rng(k + ':' + (day(k).reroll || 0));
+    const pool = [...QUESTS];
+    for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+    return pool.slice(0, 3);
+  }
+
+  function viewProgress() {
+    const a = all();
+    const j = a.journal.slice(0, 40).map(([k, d]) => `<li><div class="d">${fmtDay(k)}</div>${esc(d.j)}</li>`).join('');
+    const yearly = a.dayNo >= 7 ? Math.pow(a.idx, 365 / a.dayNo) : null;
+    return kpis() + `<div class="grid g2">
+      <section class="card wide">
+        <h2>Сложный процент вашей жизни</h2>
+        <p class="lead">Ваш индекс на фоне двух сценариев: «каждый день +1%» и «каждый день −1%». Чем ближе линия к верхнему пунктиру, тем лучше.</p>
+        <div class="legend">
+          <span><i style="border-color:var(--c1)"></i>Ваш индекс</span>
+          <span><i class="dash" style="border-color:var(--c3)"></i>Каждый день +1%</span>
+          <span><i class="dash" style="border-color:var(--c2)"></i>Каждый день −1%</span>
+        </div>
+        <div class="chart" id="growthChart"></div>
+        <div class="formula">
+          <div><b>1,01³⁶⁵ ≈ 37,8</b>год по 1% вверх</div>
+          <div><b>0,99³⁶⁵ ≈ 0,03</b>год по 1% вниз</div>
+          <div><b>1,00³⁶⁵ = 1</b>год на месте</div>
+          <div><b>${yearly ? '×' + num(yearly, 2) : '—'}</b>${yearly ? 'ваш темп за год' : 'темп за год будет виден через 7 дней'}</div>
+        </div>
+      </section>
+      <section class="card wide">
+        <h2>Календарь последних 26 недель</h2>
+        <p class="lead">Чем темнее клетка, тем больше XP за день. Клетка с рамкой означает день восстановления.</p>
+        <div class="heat-wrap"><div class="heat" id="heat"></div></div>
+        <div class="heat-legend">Меньше <i style="background:var(--soft)"></i><i style="background:var(--h1)"></i><i style="background:var(--h2)"></i><i style="background:var(--h3)"></i><i style="background:var(--h4)"></i> Больше
+          <span style="margin-left:12px"><i style="box-shadow:inset 0 0 0 1.5px var(--ink-3)"></i> восстановление</span></div>
+      </section>
+      <section class="card">
+        <h2>Статистика</h2>
+        <div class="stats" style="margin-top:10px">
+          <div class="stat"><b>${a.dayNo}</b><span>дней в пути</span></div>
+          <div class="stat"><b>${a.grow}</b><span>дней роста</span></div>
+          <div class="stat"><b>${a.records}</b><span>рекордов над вчерашним днём</span></div>
+          <div class="stat"><b>${a.best}</b><span>лучшая серия</span></div>
+          <div class="stat"><b>${num(a.actions)}</b><span>полезных действий</span></div>
+          <div class="stat"><b>${a.bestDay ? a.bestDay.xp : 0}</b><span>XP в лучший день${a.bestDay && a.bestDay.xp ? ` (${fmtShort(a.bestDay.k)})` : ''}</span></div>
+          <div class="stat"><b>${a.quests}</b><span>заданий дня</span></div>
+          <div class="stat"><b>${a.rest}</b><span>дней восстановления</span></div>
+        </div>
+      </section>
+      <section class="card">
+        <h2>Дневник маленьких улучшений</h2>
+        ${j ? `<ul class="journal-list">${j}</ul>` : '<p class="muted">Здесь появятся ваши записи «в чём я стал на 1% лучше».</p>'}
+      </section>
+    </div>`;
+  }
+
+  function drawGrowth() {
+    const box = document.getElementById('growthChart');
+    if (!box) return;
+    const a = all(), tl = a.tl;
+    const W = Math.max(300, box.clientWidth), H = 280;
+    const m = { l: 44, r: W < 500 ? 62 : 84, t: 14, b: 26 };
+    const n = tl.length, D = Math.max(n, 30);
+    const pts = [{ i: 0, v: 1 }].concat(tl.map((d, i) => ({ i: i + 1, v: d.idx })));
+    const up = (i) => Math.pow(1.01, i), down = (i) => Math.pow(0.99, i);
+    const vals = pts.map((p) => p.v);
+    const yMin = Math.min(down(D), ...vals), yMax = Math.max(up(D), ...vals);
+    const pad = (yMax - yMin) * 0.06;
+    const lo = yMin - pad, hi = yMax + pad;
+    const x = (i) => m.l + (i / D) * (W - m.l - m.r);
+    const y = (v) => m.t + (1 - (v - lo) / (hi - lo)) * (H - m.t - m.b);
+    const path = (f, from, to) => { let s = ''; for (let i = from; i <= to; i++) s += (i === from ? 'M' : 'L') + x(i).toFixed(1) + ' ' + y(f(i)).toFixed(1); return s; };
+
+    // сетка
+    const step = niceStep((hi - lo) / 5);
+    let grid = '';
+    for (let v = Math.ceil(lo / step) * step; v <= hi; v += step) {
+      const yy = y(v);
+      grid += `<line x1="${m.l}" x2="${W - m.r}" y1="${yy}" y2="${yy}" stroke="var(--line)"/>
+        <text x="${m.l - 6}" y="${yy + 4}" text-anchor="end">×${num(v, step < 0.05 ? 2 : 1)}</text>`;
+    }
+    const y1 = y(1);
+    grid += `<line x1="${m.l}" x2="${W - m.r}" y1="${y1}" y2="${y1}" stroke="var(--ink-3)" stroke-width="1"/>`;
+    // ось X: дни
+    const xt = niceStep(D / 5, true);
+    for (let i = 0; i <= D; i += xt) grid += `<text x="${x(i)}" y="${H - 6}" text-anchor="middle">${i === 0 ? 'старт' : 'д. ' + i}</text>`;
+
+    const actual = pts.map((p, i) => (i ? 'L' : 'M') + x(p.i).toFixed(1) + ' ' + y(p.v).toFixed(1)).join('');
+    const last = pts[pts.length - 1];
+    // подписи справа с разведением по вертикали
+    const labels = [
+      { y: y(up(D)), t: `+1%: ×${num(up(D), 2)}`, c: 'var(--c3)' },
+      { y: y(last.v), t: `Вы: ×${num(last.v, 3)}`, c: 'var(--c1)', at: x(last.i) },
+      { y: y(down(D)), t: `−1%: ×${num(down(D), 2)}`, c: 'var(--c2)' },
+    ].sort((p, q) => p.y - q.y);
+    for (let i = 1; i < labels.length; i++) if (labels[i].y - labels[i - 1].y < 15) labels[i].y = labels[i - 1].y + 15;
+    const lab = labels.map((l) => `<text class="lbl" x="${(l.at ?? x(D)) + 8}" y="${l.y + 4}" style="fill:var(--ink)">${l.t}</text>`).join('');
+
+    box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" height="${H}" role="img" aria-label="График индекса роста">
+      ${grid}
+      <path d="${path(up, 0, D)}" fill="none" stroke="var(--c3)" stroke-width="2" stroke-dasharray="5 4"/>
+      <path d="${path(down, 0, D)}" fill="none" stroke="var(--c2)" stroke-width="2" stroke-dasharray="5 4"/>
+      <path d="${actual}" fill="none" stroke="var(--c1)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+      <circle cx="${x(last.i)}" cy="${y(last.v)}" r="5" fill="var(--c1)" stroke="var(--surface)" stroke-width="2"/>
+      ${lab}
+      <line id="gx" y1="${m.t}" y2="${H - m.b}" stroke="var(--ink-3)" stroke-width="1" opacity="0"/>
+      <circle id="gd" r="4.5" fill="var(--c1)" stroke="var(--surface)" stroke-width="2" opacity="0"/>
+      <rect x="${m.l}" y="0" width="${W - m.l - m.r}" height="${H}" fill="transparent" id="gHit"/>
+    </svg>`;
+    const svg = box.querySelector('svg'), gx = svg.querySelector('#gx'), gd = svg.querySelector('#gd');
+    svg.querySelector('#gHit').addEventListener('pointermove', (e) => {
+      const r = svg.getBoundingClientRect();
+      const px = ((e.clientX - r.left) / r.width) * W;
+      const i = Math.max(0, Math.min(D, Math.round(((px - m.l) / (W - m.l - m.r)) * D)));
+      gx.setAttribute('x1', x(i)); gx.setAttribute('x2', x(i)); gx.setAttribute('opacity', 1);
+      const p = pts[i];
+      if (p) { gd.setAttribute('cx', x(i)); gd.setAttribute('cy', y(p.v)); gd.setAttribute('opacity', 1); } else gd.setAttribute('opacity', 0);
+      const dk = i > 0 && tl[i - 1] ? tl[i - 1] : null;
+      const head = i === 0 ? 'Старт пути' : `День ${i}${dk ? ' · ' + fmtShort(dk.k) : ' (впереди)'}`;
+      showTip(`<b>${head}</b>${p ? `<br>Вы: ×${num(p.v, 3)}${dk ? ` · ${dk.xp} XP` : ''}` : ''}<br>+1% каждый день: ×${num(up(i), 3)}<br>−1% каждый день: ×${num(down(i), 3)}`, e.clientX, e.clientY - 10);
+    });
+    svg.querySelector('#gHit').addEventListener('pointerleave', () => { gx.setAttribute('opacity', 0); gd.setAttribute('opacity', 0); hideTip(); });
+  }
+  function niceStep(raw, int) {
+    const p = Math.pow(10, Math.floor(Math.log10(raw)));
+    const f = raw / p;
+    const s = (f <= 1.5 ? 1 : f <= 3 ? 2 : f <= 7 ? 5 : 10) * p;
+    return int ? Math.max(1, Math.round(s)) : s;
+  }
+
+  function drawHeat() {
+    const box = document.getElementById('heat');
+    if (!box) return;
+    const a = all(), t = todayKey(), min = state.settings.minXP;
+    const dow = (dateOf(t).getDay() + 6) % 7; // пн = 0
+    let k = addDays(t, -(25 * 7 + dow));
+    let html = '';
+    for (let i = 0; i < 26 * 7; i++, k = addDays(k, 1)) {
+      if (k > t) { html += '<i class="none"></i>'; continue; }
+      const c = a.days[k];
+      let cls = '', st = '';
+      if (!c) { cls = 'before'; }
+      else if (c.status === 'rest') { cls = 'rest'; st = 'восстановление'; }
+      else if (c.xp <= 0) { st = k === t ? 'пока пусто' : 'спад −1%'; }
+      else if (c.xp < min) { cls = 'l1'; st = k === t ? 'в процессе' : 'удержание'; }
+      else if (c.xp < min * 1.5) { cls = 'l2'; st = 'рост +1%'; }
+      else if (c.xp < min * 2) { cls = 'l3'; st = 'рост +1%'; }
+      else { cls = 'l4'; st = 'рост +1%'; }
+      if (k === t) cls += ' today';
+      const tipText = c ? `<b>${fmtDay(k, { weekday: 'short', day: 'numeric', month: 'long' })}</b><br>${c.xp} XP · ${st}` : `${fmtShort(k)}: до начала пути`;
+      html += `<i class="${cls}" data-tip="${esc(tipText)}"></i>`;
+    }
+    box.innerHTML = html;
+    const w = box.parentElement.clientWidth;
+    box.style.setProperty('--cell', Math.max(11, Math.min(22, Math.floor((w - 25 * 3) / 26))) + 'px');
+  }
+
+  // ---------- отчёт ----------
+  const TAG_RE = /#[\p{L}\p{N}_-]+/gu;
+  const tagsOf = (s) => [...new Set((s || '').toLowerCase().match(TAG_RE) || [])];
+  const hl = (s) => esc(s).replace(TAG_RE, (m) => `<span class="tag">${m}</span>`);
+  const dayTags = (k) => {
+    const d = day(k);
+    return [...new Set([...tagsOf(d.j), ...(d.a || []).flatMap((a) => tagsOf(a.text)), ...(d.h || []).flatMap((id) => tagsOf(noteOf(d, id))),
+      ...sbList(d).flatMap(({ r }) => tagsOf(r.note))])];
+  };
+  const STATUS_TXT = { grow: '✅ рост', hold: '➖ удержание', miss: '🔻 спад', rest: '🛌 восстановление' };
+  const statusText = (k, s) => (k === todayKey() && s !== 'grow' && s !== 'rest' ? '⏳ в процессе' : STATUS_TXT[s]);
+  const PERIODS = [[7, '7 дней'], [30, '30 дней'], [90, '90 дней'], [365, 'Год'], [0, 'Всё время']];
+  let rep = { period: 30, tag: null, open: {}, habit: null, q: '' };
+
+  // заметки к привычкам за период: [{k, h, text}], новые сверху
+  function periodNotes(ks) {
+    const out = [];
+    ks.forEach((k) => {
+      const d = day(k);
+      (d.h || []).forEach((id) => { const text = noteOf(d, id), h = habitById(id); if (text && h) out.push({ k, h, text }); });
+    });
+    return out;
+  }
+
+  function renderNotes() {
+    const box = document.getElementById('notesList');
+    if (!box) return;
+    const q = rep.q.trim().toLowerCase();
+    const list = periodNotes(periodKeys()).filter((x) =>
+      (!rep.habit || x.h.id === rep.habit) && (!rep.tag || tagsOf(x.text).includes(rep.tag)) && (!q || x.text.toLowerCase().includes(q) || x.h.name.toLowerCase().includes(q)));
+    const mark = (html) => {
+      if (!q) return html;
+      const re = new RegExp(esc(q).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+      return html.replace(/(<[^>]*>)|([^<]+)/g, (m, tag, txt) => tag || txt.replace(re, (s) => `<mark>${s}</mark>`));
+    };
+    document.getElementById('notesCount').textContent = list.length ? `Найдено заметок: ${list.length}` : '';
+    box.innerHTML = list.length
+      ? list.map((x) => `<li><div class="d">${fmtDay(x.k)} · ${sphere(x.h.sphere).icon} ${esc(x.h.name)}</div>${mark(hl(x.text))}</li>`).join('')
+      : `<li class="muted">${rep.habit || q || rep.tag ? 'Ничего не найдено. Измените фильтр или период.' : 'Заметок за этот период пока нет. Отметьте привычку с вопросом на экране «Сегодня» и ответьте парой строк.'}</li>`;
+  }
+
+  function periodKeys() {
+    const t = todayKey();
+    const from = rep.period ? addDays(t, -(rep.period - 1)) : state.start;
+    const ks = [];
+    for (let k = t; k >= (from > state.start ? from : state.start); k = addDays(k, -1)) ks.push(k);
+    return ks;
+  }
+
+  // все теги за всё время, по частоте (для подсказок в дневнике)
+  function allTags() {
+    const n = {};
+    Object.keys(state.days).forEach((k) => dayTags(k).forEach((tg) => { n[tg] = (n[tg] || 0) + 1; }));
+    return Object.entries(n).sort((a, b) => b[1] - a[1]).map(([tg]) => tg);
+  }
+
+  function viewReport() {
+    const a = all(), t = todayKey(), ks = periodKeys();
+    const idxOf = Object.fromEntries(a.tl.map((x) => [x.k, x.idx]));
+    let xp = 0, grow = 0, miss = 0, acts = 0, sbN = 0, sbLost = 0, cleanDays = 0;
+    const bySphere = {}, sphereActs = {}, habitDays = {}, tags = {}, sbStat = {}, sbNotes = [];
+    ks.forEach((k) => {
+      const c = a.days[k], d = day(k);
+      xp += c.xp; acts += c.count; sbLost += c.pen;
+      const recs = sbList(d);
+      if (!recs.some(({ r }) => !r.fix)) cleanDays++;
+      recs.forEach(({ sb, r }) => {
+        sbN++;
+        const m = (sbStat[sb.id] = sbStat[sb.id] || { n: 0, fix: 0, noted: 0, lost: 0 });
+        m.n++; m.lost += penOf(sb, r);
+        if (r.fix) m.fix++;
+        if ((r.note || '').trim()) { m.noted++; sbNotes.push({ k, sb, r }); }
+      });
+      if (c.status === 'grow') grow++; else if (c.status === 'miss' && k !== t) miss++;
+      for (const s in c.by) bySphere[s] = (bySphere[s] || 0) + c.by[s];
+      (d.h || []).forEach((id) => { habitDays[id] = (habitDays[id] || 0) + 1; const h = habitById(id); if (h) sphereActs[h.sphere] = (sphereActs[h.sphere] || 0) + 1; });
+      (d.q || []).forEach((id) => { const q = QUEST_BY_ID[id]; if (q) sphereActs[q.sphere] = (sphereActs[q.sphere] || 0) + 1; });
+      (d.a || []).forEach((x) => { sphereActs[x.sphere] = (sphereActs[x.sphere] || 0) + 1; });
+      dayTags(k).forEach((tg) => {
+        const m = (tags[tg] = tags[tg] || { n: 0, first: k, last: k });
+        m.n++; if (k < m.first) m.first = k; if (k > m.last) m.last = k;
+      });
+    });
+    const before = addDays(ks[ks.length - 1], -1);
+    const idxStart = idxOf[before] || 1, idxEnd = idxOf[t] || 1;
+    const dIdx = (idxEnd / idxStart - 1) * 100;
+
+    if (rep.tag && !tags[rep.tag]) rep.tag = null;
+    const tagList = Object.entries(tags).sort((x, y) => y[1].n - x[1].n || y[1].last.localeCompare(x[1].last));
+    const tagChips = tagList.map(([tg, m]) => `<button class="tagbtn${rep.tag === tg ? ' on' : ''}" data-act="repTag" data-tag="${esc(tg)}">${esc(tg)}<b>${m.n}</b></button>`).join('');
+    const tagTable = tagList.map(([tg, m]) => `<tr class="click" data-act="repTag" data-tag="${esc(tg)}"><td><span class="tag">${esc(tg)}</span></td>
+      <td class="n">${m.n}</td><td class="nowrap">${fmtShort(m.first)}</td><td class="nowrap">${fmtShort(m.last)}</td></tr>`).join('');
+
+    // сфера может уйти в минус из-за срывов: доля и полоска считаются только по положительным
+    const maxS = Math.max(1, ...Object.values(bySphere));
+    const posTotal = Object.values(bySphere).reduce((s, v) => s + Math.max(0, v), 0);
+    const sphereRows = state.spheres.map((s) => {
+      const v = bySphere[s.id] || 0;
+      return `<tr><td class="nowrap">${s.icon} ${esc(s.name)}</td><td class="n"${v < 0 ? ' style="color:var(--bad)"' : ''}>${v}</td><td class="n">${sphereActs[s.id] || 0}</td>
+        <td class="n">${posTotal ? num((Math.max(0, v) / posTotal) * 100) : 0}%</td><td style="width:30%"><div class="mini"><i style="width:${Math.max(0, v / maxS) * 100}%;background:${color(s.id)}"></i></div></td></tr>`;
+    }).join('');
+
+    const sbRows = state.setbacks.filter((s) => sbStat[s.id] || !s.archived)
+      .sort((x, y) => ((sbStat[y.id] || {}).n || 0) - ((sbStat[x.id] || {}).n || 0))
+      .map((s) => {
+        const m = sbStat[s.id] || { n: 0, fix: 0, noted: 0, lost: 0 }, w = sbDaysWithout(s);
+        return `<tr><td>${sphere(s.sphere).icon} ${esc(s.name)}${s.archived ? ' <span class="muted">(архив)</span>' : ''}</td>
+          <td class="n">${m.n || '<span class="muted">0</span>'}</td><td class="n">${m.fix}</td><td class="n">${m.noted}</td>
+          <td class="n"${m.lost ? ' style="color:var(--bad)"' : ''}>${m.lost ? '−' + m.lost : 0}</td>
+          <td class="n">${w ? w + ' дн.' : 'сегодня'}</td></tr>`;
+      }).join('');
+    const sbNoteList = sbNotes.map(({ k, sb, r }) => `<li><div class="d">${fmtDay(k)} · ${sphere(sb.sphere).icon} ${esc(sb.name)} · ${r.fix ? '✓ исправлено' : 'штраф ×½'}</div>${hl(r.note)}</li>`).join('');
+
+    const habits = state.habits.filter((h) => !h.archived || habitDays[h.id])
+      .sort((x, y) => (habitDays[y.id] || 0) - (habitDays[x.id] || 0));
+    const notes = periodNotes(ks), noteCount = {};
+    notes.forEach((x) => { noteCount[x.h.id] = (noteCount[x.h.id] || 0) + 1; });
+    const habitRows = habits.map((h) => {
+      const n = habitDays[h.id] || 0, p = (n / ks.length) * 100, nc = noteCount[h.id] || 0;
+      return `<tr><td>${sphere(h.sphere).icon} ${esc(h.name)}${h.archived ? ' <span class="muted">(архив)</span>' : ''}</td>
+        <td class="n">${n} из ${ks.length}</td><td class="n">${num(p)}%</td>
+        <td class="n">${nc ? `<button class="btn small" data-act="repNotes" data-id="${h.id}">✎ ${nc}</button>` : '<span class="muted">—</span>'}</td>
+        <td style="width:30%"><div class="mini"><i style="width:${p}%;background:${color(h.sphere)}"></i></div></td></tr>`;
+    }).join('');
+
+    const rows = (rep.tag ? ks.filter((k) => dayTags(k).includes(rep.tag)) : ks).map((k) => {
+      const c = a.days[k], d = day(k), open = rep.open[k];
+      const prev = idxOf[addDays(k, -1)] || 1;
+      const delta = idxOf[k] / prev - 1;
+      const dTxt = Math.abs(delta) < 1e-9 ? '0' : (delta > 0 ? '+' : '−') + '1%';
+      const dots = Object.keys(c.by).map((s) => `<span class="sw" style="background:${color(s)}" data-tip="${esc(sphere(s).icon + ' ' + sphere(s).name + ': ' + c.by[s] + ' XP')}"></span>`).join(' ');
+      let html = `<tr class="click${open ? ' open' : ''}" data-act="repRow" data-k="${k}">
+        <td class="nowrap">${open ? '▾' : '▸'} ${fmtDay(k, { weekday: 'short', day: 'numeric', month: 'short' })}</td>
+        <td class="nowrap">${statusText(k, c.status)}</td>
+        <td class="n">${c.xp}</td>
+        <td class="n">×${num(idxOf[k] || 1, 3)} <span class="muted">${dTxt}</span></td>
+        <td class="nowrap">${c.count} ${dots}${c.sb ? ` <span style="color:var(--bad)" data-tip="${esc(`Срывов: ${c.sb}, штраф −${c.pen} XP`)}">🔻${c.sb}</span>` : ''}</td>
+        <td class="jr">${d.j ? hl(d.j) : '<span class="muted">—</span>'}</td></tr>`;
+      if (open) {
+        const list = (title, items) => items.length ? `<div><b>${title}</b><ul>${items.map((x) => `<li>${x}</li>`).join('')}</ul></div>` : '';
+        const hs = (d.h || []).map(habitById).filter(Boolean).map((h) => {
+          const note = noteOf(d, h.id);
+          return `${sphere(h.sphere).icon} ${esc(h.name)} <span class="muted">+${h.xp * (h.sphere === c.focus ? 2 : 1) + (note ? NOTE_XP : 0)}</span>${note ? `<br><span style="color:var(--ink)">✎ ${hl(note)}</span>` : ''}`;
+        });
+        const qs = (d.q || []).map((id) => QUEST_BY_ID[id]).filter(Boolean).map((q) => `${sphere(q.sphere).icon} ${esc(q.text)} <span class="muted">+${q.xp}</span>`);
+        const as = (d.a || []).map((x) => `${sphere(x.sphere).icon} ${hl(x.text)} <span class="muted">+${x.xp}</span>`);
+        const ss = sbList(d).map(({ sb, r }) => `🔻 ${sphere(sb.sphere).icon} ${esc(sb.name)} <span style="color:var(--bad)">${penOf(sb, r) ? '−' + penOf(sb, r) : '0'}</span>
+          <span class="muted">${r.fix ? '(исправлено: ' + esc(sb.fix) + ')' : (r.note || '').trim() ? '(с разбором)' : ''}</span>${(r.note || '').trim() ? `<br><span style="color:var(--ink)">✎ ${hl(r.note)}</span>` : ''}`);
+        const gs = goalDayLines(k).map((x) => esc(x));
+        const body = list('Цели', gs) + list('Привычки', hs) + list('Задания дня', qs) + list('Другие дела', as) + list('Срывы', ss)
+          + (c.focus ? `<div class="muted">Сфера-фокус дня: ${sphere(c.focus).icon} ${esc(sphere(c.focus).name)} (×2)</div>` : '');
+        html += `<tr class="detail"><td colspan="6">${body || 'В этот день ничего не отмечено.'}
+          <div style="margin-top:6px"><button class="btn small" data-act="goDay" data-k="${k}">Открыть день и изменить</button></div></td></tr>`;
+      }
+      return html;
+    }).join('');
+
+    return `<div class="grid g2">
+      <section class="card wide">
+        <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div class="seg">${PERIODS.map(([p, n]) => `<button class="${rep.period === p ? 'on' : ''}" data-act="repPeriod" data-p="${p}">${n}</button>`).join('')}</div>
+          <button class="btn small" data-act="csv">⬇ Таблица для Excel (CSV)</button>
+        </div>
+        <div class="stats">
+          <div class="stat"><b>${ks.length}</b><span>дней в отчёте</span></div>
+          <div class="stat"><b>${grow}</b><span>дней роста</span></div>
+          <div class="stat"><b>${miss}</b><span>дней спада</span></div>
+          <div class="stat"><b>${num(xp)}</b><span>XP за период</span></div>
+          <div class="stat"><b>${acts}</b><span>полезных действий</span></div>
+          <div class="stat"><b>${dIdx >= 0 ? '+' : ''}${num(dIdx, 1)}%</b><span>изменение индекса</span></div>
+          <div class="stat"><b>${sbN}</b><span>срывы, раз</span></div>
+          <div class="stat"><b>${sbLost ? '−' + sbLost : 0}</b><span>XP потеряно на срывах</span></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>В чём я стал лучше: теги</h2>
+        <p class="lead">Теги вида <span class="tag">#терпение</span> берутся из дневника и из записей «любое полезное дело». Щелчок по тегу оставляет в таблице дней только эти дни.</p>
+        ${tagList.length ? `<div class="tags" style="margin-bottom:12px">${tagChips}</div>
+          <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Тег</th><th class="n">Дней</th><th>Впервые</th><th>Последний раз</th></tr></thead><tbody>${tagTable}</tbody></table></div>`
+          : '<p class="muted">За этот период тегов нет. Добавьте в дневник, например: «Не сорвался на споре #терпение».</p>'}
+      </section>
+
+      <section class="card">
+        <h2>По сферам</h2>
+        <p class="lead">Сколько XP и действий пришлось на каждую сферу за период.</p>
+        <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Сфера</th><th class="n">XP</th><th class="n">Действий</th><th class="n">Доля</th><th></th></tr></thead><tbody>${sphereRows}</tbody></table></div>
+      </section>
+
+      <section class="card wide">
+        <h2>По привычкам</h2>
+        <p class="lead">Сколько дней из периода привычка была выполнена.</p>
+        <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Привычка</th><th class="n">Дней</th><th class="n">%</th><th class="n">Заметок</th><th></th></tr></thead><tbody>${habitRows}</tbody></table></div>
+      </section>
+
+      <section class="card wide">
+        <h2>🔻 Срывы и откаты</h2>
+        <p class="lead">Чистых дней в периоде: <b>${cleanDays}</b> из ${ks.length}. Сейчас без срывов ${a.clean} дн. подряд, рекорд ${a.bestClean}.
+          В колонке «Дней без» — сколько дней прошло с последнего раза.</p>
+        <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Срыв</th><th class="n">Раз</th><th class="n">Исправлено</th><th class="n">С разбором</th><th class="n">Потеряно XP</th><th class="n">Дней без</th></tr></thead><tbody>${sbRows}</tbody></table></div>
+        ${sbNoteList ? `<h2 style="margin-top:16px">Разборы: что случилось и выводы</h2><ul class="notes-list">${sbNoteList}</ul>` : ''}
+      </section>
+
+      ${state.goals.length ? `<section class="card wide">
+        <h2>🎯 Цели</h2>
+        <p class="lead">Все цели за всё время: прогресс, план и факт. Сдвиг показывает, на сколько дней срок ушёл из-за пропусков.</p>
+        <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Цель</th><th>Прогресс</th><th class="n">Старт</th><th class="n">План</th><th class="n">Факт / прогноз</th><th class="n">Сдвиг</th><th>Итог</th></tr></thead><tbody>
+        ${state.goals.map((g) => {
+          const i = goalInfo(g), end = i.doneAt || i.expEnd;
+          return `<tr><td>${sphere(g.sphere).icon} ${esc(g.title)}</td><td class="nowrap">${Math.round(i.progress * 100)}% <span class="muted">${esc(goalProgressText(g, i))}</span></td>
+            <td class="n">${fmtShort(g.start)}</td><td class="n">${fmtShort(i.planEnd)}</td><td class="n">${end ? fmtShort(end) : '—'}</td>
+            <td class="n">${i.shift === null ? '—' : i.shift > 0 ? `<span style="color:var(--bad)">+${i.shift} дн.</span>` : i.shift < 0 ? `−${-i.shift} дн.` : '0'}</td>
+            <td class="nowrap">${i.medal ? MEDALS[i.medal].join(' ') : g.status === 'dropped' ? 'отложена' : 'в работе'}</td></tr>`;
+        }).join('')}</tbody></table></div>
+      </section>` : ''}
+
+      <section class="card wide" id="notesCard">
+        <h2>Заметки к привычкам</h2>
+        <p class="lead">Ваши ответы на вопросы привычек: что читали, что узнали, над чем работали. Учитываются период и выбранный тег.</p>
+        <div class="row" style="margin-bottom:6px">
+          <select id="noteHabit">
+            <option value="">Все привычки</option>
+            ${state.habits.filter((h) => h.ask || noteCount[h.id]).map((h) => `<option value="${h.id}"${rep.habit === h.id ? ' selected' : ''}>${sphere(h.sphere).icon} ${esc(h.name)}${noteCount[h.id] ? ` (${noteCount[h.id]})` : ''}</option>`).join('')}
+          </select>
+          <input type="text" id="noteSearch" placeholder="Поиск по заметкам" value="${esc(rep.q)}" style="flex:1 1 180px">
+        </div>
+        <div class="muted" style="font-size:12px;margin-bottom:4px" id="notesCount"></div>
+        <ul class="notes-list" id="notesList"></ul>
+      </section>
+
+      <section class="card wide">
+        <h2>По дням</h2>
+        <p class="lead">Щёлкните по строке, чтобы увидеть, что именно было сделано.</p>
+        ${rep.tag ? `<div class="filter-note">Показаны дни с тегом <span class="tag">${esc(rep.tag)}</span><button class="btn small" data-act="repTag" data-tag="${esc(rep.tag)}">✕ Снять фильтр</button></div>` : ''}
+        <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Дата</th><th>Статус</th><th class="n">XP</th><th class="n">Индекс</th><th>Действий</th><th>В чём стал лучше</th></tr></thead>
+          <tbody>${rows || '<tr><td colspan="6" class="muted">Нет дней для показа.</td></tr>'}</tbody></table></div>
+      </section>
+    </div>`;
+  }
+
+  function exportCSV() {
+    const a = all(), ks = periodKeys().reverse();
+    const idxOf = Object.fromEntries(a.tl.map((x) => [x.k, x.idx]));
+    const q = (s) => `"${String(s).replace(/"/g, '""')}"`;
+    const lines = [['Дата', 'Статус', 'XP', 'Индекс', 'Привычки', 'Заметки к привычкам', 'Задания дня', 'Другие дела', 'Срывы', 'Цели', 'Теги', 'В чём стал лучше'].map(q).join(';')];
+    ks.forEach((k) => {
+      const c = a.days[k], d = day(k);
+      lines.push([
+        k, statusText(k, c.status).replace(/^\S+\s/, ''), c.xp, num(idxOf[k] || 1, 4),
+        (d.h || []).map(habitById).filter(Boolean).map((h) => h.name).join(', '),
+        (d.h || []).map(habitById).filter((h) => h && noteOf(d, h.id)).map((h) => `${h.name}: ${noteOf(d, h.id)}`).join(' | '),
+        (d.q || []).map((id) => QUEST_BY_ID[id]).filter(Boolean).map((x) => x.text).join(', '),
+        (d.a || []).map((x) => x.text).join(', '),
+        sbList(d).map(({ sb, r }) => `${sb.name} (${r.fix ? 'исправлено' : '−' + penOf(sb, r) + ' XP'})${(r.note || '').trim() ? ': ' + r.note.trim() : ''}`).join(' | '),
+        goalDayLines(k).join(' | '),
+        dayTags(k).join(' '), d.j || ''
+      ].map(q).join(';'));
+    });
+    const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    const el = document.createElement('a');
+    el.href = URL.createObjectURL(blob); el.download = `plus-one-percent-report-${todayKey()}.csv`;
+    el.click(); setTimeout(() => URL.revokeObjectURL(el.href), 1000);
+  }
+
+  // ---------- вкладка «Цели» ----------
+  let goalDraft = null;
+  const GOAL_KIND = { time: '⏱️ по времени', sum: '💰 накопление', measure: '📏 замер' };
+  const GOAL_TPLS = [
+    ['sleep', '😴', 'Режим сна', 'Сдвигать отбой понемногу, чтобы высыпаться к подъёму'],
+    ['weight', '⚖️', 'Снизить вес', 'Замер каждый день, план и прогноз даты'],
+    ['money', '💰', 'Накопить сумму', 'Откладывать каждый день равную часть'],
+    ['time', '⏱️', 'Своё время', 'Ступенчато сдвинуть подъём, начало работы и т. п.'],
+    ['sum', '📚', 'Своё накопление', 'Страницы, километры, часы практики'],
+    ['measure', '📏', 'Свой замер', 'Пульс, давление, обхват — любой показатель'],
+  ];
+  const nval = (x) => Number(String(x ?? '').replace(',', '.').replace(/\s/g, ''));
+  const hm = (m) => `${Math.floor(m / 60)} ч${m % 60 ? ' ' + (m % 60) + ' мин' : ''}`;
+
+  function goalTemplate(id) {
+    const p = state.profile;
+    const wake = toMin(p.wake) ?? toMin('07:00'), sleepH = nval(p.sleepH) || 8;
+    if (id === 'sleep') {
+      const to = fmtMin(wake - sleepH * 60);
+      const bedHabit = state.habits.find((h) => !h.archived && /спать до/i.test(h.name));
+      return { tpl: id, type: 'time', title: `Подъём в ${fmtMin(wake)}: отбой в ${to}`, sphere: 'health', from: toMin(p.bed) ? fmtMin(toMin(p.bed)) : '23:30', to, days: 10,
+        label: 'Лечь спать до {v}', habit: `Лёг спать до ${to}`, archiveHabit: bedHabit ? bedHabit.id : '', archiveOn: true };
+    }
+    if (id === 'weight') {
+      const w = nval(p.weight) || 95, h = nval(p.height);
+      let to = Math.round(w - 5);
+      if (h) { const upper = Math.floor(25 * (h / 100) ** 2); if (w > upper) to = Math.max(upper, to); }
+      return { tpl: id, type: 'measure', title: `Снизить вес до ${to} кг`, sphere: 'health', unit: 'кг', from: w, to, days: Math.ceil(((w - to) / 0.5) * 7), label: 'Вес сегодня', habit: '' };
+    }
+    if (id === 'money') return { tpl: id, type: 'sum', title: 'Накопить 5000 ₽', sphere: 'money', unit: '₽', to: 5000, days: 10, label: 'Отложить {v} на цель', habit: 'Отложил немного денег' };
+    if (id === 'time') return { tpl: id, type: 'time', title: `Вставать в ${fmtMin(wake - 30)}`, sphere: 'health', from: fmtMin(wake), to: fmtMin(wake - 30), days: 10, label: 'Встать в {v}', habit: `Встал в ${fmtMin(wake - 30)}` };
+    if (id === 'sum') return { tpl: id, type: 'sum', title: 'Прочитать 300 страниц', sphere: 'mind', unit: 'стр.', to: 300, days: 30, label: 'Прочитать {v}', habit: '' };
+    return { tpl: 'measure', type: 'measure', title: 'Пульс в покое до 65', sphere: 'health', unit: 'уд/мин', from: 75, to: 65, days: 60, label: 'Пульс утром', habit: '' };
+  }
+
+  // проверка и приведение черновика цели; { err } или { ok: цель без id }
+  function draftParsed() {
+    const g = goalDraft, days = Math.round(nval(g.days));
+    const base = { type: g.type, title: String(g.title || '').trim(), sphere: g.sphere, days, label: String(g.label || '').trim(), habit: String(g.habit || '').trim() };
+    if (!base.title) return { err: 'Введите название цели' };
+    if (!(days >= 1 && days <= 3650)) return { err: 'Срок — целое число дней, от 1' };
+    if (g.type === 'time') {
+      const a = toMin(g.from), b = toMin(g.to);
+      if (a === null || b === null) return { err: 'Время пишется как ЧЧ:ММ, например 23:30' };
+      if (a === b) return { err: 'Время «сейчас» и цель совпадают' };
+      if (!base.label.includes('{v}')) return { err: 'В задании дня нужен {v}: туда подставится время шага' };
+      return { ok: { ...base, from: fmtMin(a), to: fmtMin(b) } };
+    }
+    if (g.type === 'sum') {
+      const to = nval(g.to);
+      if (!(to > 0)) return { err: 'Укажите, сколько всего нужно набрать' };
+      if (!base.label.includes('{v}')) return { err: 'В задании дня нужен {v}: туда подставится порция' };
+      const raw = to / days;
+      return { ok: { ...base, to, unit: String(g.unit || '').trim(), step: raw >= 1 ? Math.ceil(raw) : Math.ceil(raw * 10) / 10 } };
+    }
+    const from = nval(g.from), to = nval(g.to);
+    if (!isFinite(from) || !isFinite(to) || String(g.from).trim() === '' || String(g.to).trim() === '') return { err: 'Укажите текущее значение и цель числами' };
+    if (from === to) return { err: 'Текущее значение и цель совпадают' };
+    return { ok: { ...base, from, to, unit: String(g.unit || '').trim(), label: base.label || 'Замер' } };
+  }
+
+  function goalPreview() {
+    const r = draftParsed();
+    if (r.err) return `<span class="warn">${esc(r.err)}</span>`;
+    const g = r.ok, end = fmtDay(addDays(todayKey(), g.days - 1), { day: 'numeric', month: 'long' });
+    const lines = [];
+    if (g.type === 'time') {
+      const a = toMin(g.from), b = toMin(g.to), per = Math.abs(b - a) / g.days;
+      const steps = [1, 2, 3].filter((i) => i < g.days).map((i) => fmtMin(goalStepVal(g, i)));
+      if (goalDraft.tpl === 'sleep') lines.push(`Подъём ${state.profile.wake || '07:00'} − ${nval(state.profile.sleepH) || 8} ч сна = отбой в <b>${g.to}</b>.`);
+      lines.push(`Каждый день на <b>${num(per, per % 1 ? 1 : 0)} мин ${b < a ? 'раньше' : 'позже'}</b>: ${steps.join(', ')}${steps.length ? ' … ' : ''}${g.to}.`);
+      if (per > 15) lines.push('<span class="warn">⚠️ Больше 15 минут за день — организму тяжело перестроиться. Лучше увеличить срок.</span>');
+    } else if (g.type === 'sum') {
+      lines.push(`По <b>${fmtNum(g.step)} ${esc(g.unit)}</b> в день. Задание дня: «${esc(goalStepText(g, fmtNum(g.step) + ' ' + g.unit))}».`);
+    } else {
+      const perWeek = Math.abs(g.to - g.from) / g.days * 7;
+      lines.push(`Примерно <b>${num(perWeek, perWeek < 10 ? 2 : 0)} ${esc(g.unit)} в неделю</b>. Каждый день вносите замер, и будет виден план и прогноз даты.`);
+      if (/кг/i.test(g.unit) && g.to < g.from) {
+        const safe = g.from * 0.01;
+        if (perWeek > safe) lines.push(`<span class="warn">⚠️ Быстрее безопасного темпа (около 1% веса в неделю, то есть ${num(safe, 1)} кг). Рекомендуемый срок: от ${Math.ceil((g.from - g.to) / safe * 7)} дней.</span>`);
+        const h = nval(state.profile.height);
+        if (h) lines.push(`ИМТ сейчас ${num(g.from / (h / 100) ** 2, 1)}, на цели ${num(g.to / (h / 100) ** 2, 1)} (норма 18,5–25).`);
+      }
+    }
+    lines.push(g.type === 'measure'
+      ? `Срок: <b>${end}</b>. Прогноз даты считается по вашему фактическому темпу.`
+      : `Финиш по плану: <b>${end}</b>. Пропуск задания сдвигает срок на день.`);
+    return lines.join('<br>');
+  }
+
+  function goalForm() {
+    const g = goalDraft;
+    if (!g) return '';
+    const f = (name, label, val, wide) => `<label${wide ? ' class="wide-f"' : ''}>${label}<input type="text" data-gf="${name}" value="${esc(val ?? '')}" maxlength="100"></label>`;
+    const sphereSel = `<label>Сфера<select data-gf="sphere">${state.spheres.map((s) => `<option value="${s.id}"${s.id === g.sphere ? ' selected' : ''}>${s.icon} ${esc(s.name)}</option>`).join('')}</select></label>`;
+    let fields = f('title', 'Название цели', g.title, true);
+    if (g.type === 'time') fields += f('from', 'Сейчас (ЧЧ:ММ)', g.from) + f('to', 'Цель (ЧЧ:ММ)', g.to) + f('days', 'За сколько дней', g.days) + sphereSel + f('label', 'Задание дня ({v} — время шага)', g.label, true);
+    else if (g.type === 'sum') fields += f('to', 'Сколько всего', g.to) + f('unit', 'Единица', g.unit) + f('days', 'За сколько дней', g.days) + sphereSel + f('label', 'Задание дня ({v} — порция)', g.label, true);
+    else fields += f('from', 'Сейчас', g.from) + f('to', 'Цель', g.to) + f('unit', 'Единица', g.unit) + f('days', 'Срок, дней', g.days) + sphereSel + f('label', 'Подпись замера', g.label, true);
+    fields += f('habit', 'После достижения закрепить привычкой (необязательно)', g.habit, true);
+    const ah = g.archiveHabit && habitById(g.archiveHabit);
+    if (ah) fields += `<label class="wide-f" style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" data-gf="archiveOn" ${g.archiveOn ? 'checked' : ''} style="width:auto">
+      Убрать привычку «${esc(ah.name)}» в архив: цель её заменит</label>`;
+    return `<form class="gform" id="goalForm"><div class="set-grid">${fields}</div>
+      <div class="preview" id="goalPreview">${goalPreview()}</div>
+      <div class="row" style="margin-top:12px"><button class="btn primary" type="submit">🎯 Поставить цель</button><button class="btn" type="button" data-act="goalCancel">Отмена</button></div></form>`;
+  }
+
+  function profileInfo() {
+    const p = state.profile, out = [];
+    const h = nval(p.height), w = nval(p.weight), age = nval(p.age);
+    if (h > 0 && w > 0) {
+      const bmi = w / (h / 100) ** 2;
+      const cat = bmi < 18.5 ? 'недостаток веса' : bmi < 25 ? 'норма' : bmi < 30 ? 'избыточный вес' : 'ожирение';
+      out.push(`⚖️ ИМТ <b>${num(bmi, 1)}</b>: ${cat}. Здоровый вес при росте ${fmtNum(h)} см: ${Math.ceil(18.5 * (h / 100) ** 2)}–${Math.floor(25 * (h / 100) ** 2)} кг.`);
+    }
+    const wake = toMin(p.wake), bed = toMin(p.bed), sh = nval(p.sleepH);
+    if (wake !== null && bed !== null && sh > 0) {
+      const now = (wake + (wake <= bed ? 1440 : 0)) - bed, need = fmtMin(wake - sh * 60), diff = now - sh * 60;
+      out.push(`😴 Сейчас вы спите <b>${hm(now)}</b>. Чтобы спать ${fmtNum(sh)} ч и вставать в ${fmtMin(wake)}, ложиться нужно в <b>${need}</b>${diff < 0 ? ` (на ${-diff} мин раньше)` : diff > 0 ? `, а у вас даже ${diff} мин запаса` : ''}.`);
+    }
+    if (age > 0) out.push(`🛏️ Рекомендуемый сон для вашего возраста: ${age < 18 ? '8–10' : age < 65 ? '7–9' : '7–8'} ч.`);
+    return out.join('<br>') || '<span class="muted">Заполните поля, и здесь появятся подсказки для целей.</span>';
+  }
+
+  function goalCard({ g, info }) {
+    const m = info.medal ? MEDALS[info.medal] : null;
+    const habitExists = state.habits.some((h) => h.name === g.habit);
+    return `<div class="gcard">
+      <div class="top">${m ? `<span class="medal" title="${m[1]}">${m[0]}</span>` : ''}<b>${sphere(g.sphere).icon} ${esc(g.title)}</b><span class="kind">${GOAL_KIND[g.type]}</span></div>
+      <div class="bar"><i style="width:${info.progress * 100}%;background:${color(g.sphere)}"></i></div>
+      <div class="meta">${goalProgressText(g, info)} · ${Math.round(info.progress * 100)}%${g.type === 'time' ? ` · шагов ${info.steps} из ${g.days}` : ''}</div>
+      <div class="goal-term">Старт ${fmtShort(g.start)} · ${goalTermText(g, info)}</div>
+      <div class="acts">
+        ${info.doneAt && g.habit && !habitExists ? `<button class="btn small primary" data-act="goalHabit" data-id="${g.id}">📌 Закрепить привычкой «${esc(g.habit)}»</button>` : ''}
+        ${info.active ? `<button class="btn small" data-act="goalDrop" data-id="${g.id}">Отказаться</button>` : ''}
+        ${g.status === 'dropped' && !info.doneAt ? `<button class="btn small" data-act="goalRestore" data-id="${g.id}">Вернуть в работу</button>` : ''}
+        <button class="btn small danger" data-act="goalDelete" data-id="${g.id}">Удалить</button>
+      </div>
+    </div>`;
+  }
+
+  function viewGoals() {
+    const infos = state.goals.map((g) => ({ g, info: goalInfo(g) }));
+    const active = infos.filter((x) => x.info.active);
+    const done = infos.filter((x) => x.info.doneAt).sort((x, y) => y.info.doneAt.localeCompare(x.info.doneAt));
+    const dropped = infos.filter((x) => x.g.status === 'dropped' && !x.info.doneAt);
+    const mc = (m) => done.filter((x) => x.info.medal === m).length;
+    const p = state.profile;
+    const pf = (k, label, ph) => `<label>${label}<input type="text" data-prof="${k}" value="${esc(p[k] ?? '')}" placeholder="${ph}"></label>`;
+    return `<div class="grid g2">
+      <section class="card wide">
+        <div class="stats">
+          <div class="stat"><b>${active.length}</b><span>в работе</span></div>
+          <div class="stat"><b>${done.length}</b><span>достигнуто</span></div>
+          <div class="stat"><b>${mc('gold')}</b><span>из них в срок</span></div>
+          <div class="stat"><b>🥇${mc('gold')} 🥈${mc('silver')} 🥉${mc('bronze')}</b><span>медали</span></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Профиль</h2>
+        <p class="lead">Исходные данные: из них считаются подсказки и стартовые значения целей.</p>
+        <div class="prof">
+          ${pf('age', 'Возраст', '35')}${pf('height', 'Рост, см', '180')}${pf('weight', 'Вес, кг', '95')}
+          ${pf('wake', 'Обычно встаю', '07:00')}${pf('bed', 'Обычно ложусь', '23:30')}${pf('sleepH', 'Хочу спать, ч', '8')}
+        </div>
+        <div class="preview">${profileInfo()}</div>
+      </section>
+
+      <section class="card" id="newGoal">
+        <h2>Новая цель</h2>
+        <p class="lead">Выберите шаблон: поля заполнятся из профиля, всё можно поправить.</p>
+        <div class="tpls">${GOAL_TPLS.map(([id, ic, nm, ds]) => `<button class="tpl${goalDraft && goalDraft.tpl === id ? ' on' : ''}" data-act="goalTpl" data-t="${id}"><b>${ic} ${nm}</b><span>${ds}</span></button>`).join('')}</div>
+        ${goalForm()}
+      </section>
+
+      <section class="card wide">
+        <h2>В работе</h2>
+        ${active.length ? `<div class="gcards" style="margin-top:10px">${active.map(goalCard).join('')}</div>` : '<p class="muted">Активных целей нет. Поставьте первую: её задания появятся на экране «Сегодня».</p>'}
+      </section>
+
+      ${done.length ? `<section class="card wide"><h2>Достигнутые цели</h2><p class="lead">🥇 в срок · 🥈 с опозданием до ${'20%'} срока · 🥉 позже.</p><div class="gcards">${done.map(goalCard).join('')}</div></section>` : ''}
+      ${dropped.length ? `<section class="card wide"><details><summary class="muted" style="cursor:pointer">Отложенные цели (${dropped.length})</summary><div class="gcards" style="margin-top:10px">${dropped.map(goalCard).join('')}</div></details></section>` : ''}
+    </div>`;
+  }
+
+  function viewSpheres() {
+    const a = all(), t = todayKey();
+    const last30 = {};
+    for (let i = 0; i < 30; i++) { const c = a.days[addDays(t, -i)]; if (c) for (const s in c.by) last30[s] = (last30[s] || 0) + c.by[s]; }
+    const last7 = {};
+    for (let i = 0; i < 7; i++) { const c = a.days[addDays(t, -i)]; if (c) for (const s in c.by) last7[s] = (last7[s] || 0) + c.by[s]; }
+    const focus = calcFor(t).focus;
+    const cards = state.spheres.map((s) => {
+      const xp = a.sphereXP[s.id] || 0, L = sphereLevel(xp);
+      return `<div class="sphere-card" style="--sc:${color(s.id)}">
+        <div class="top"><span class="ic">${s.icon}</span><span class="nm">${esc(s.name)}</span>${focus === s.id ? '<span class="x2">×2</span>' : ''}<span class="lvl">ур. ${L.lvl}</span></div>
+        <div class="bar"><i style="width:${((xp - L.from) / (L.to - L.from)) * 100}%"></i></div>
+        <div class="meta"><span>${xp} XP всего</span><span>${last7[s.id] || 0} XP за 7 дней</span></div>
+      </div>`;
+    }).join('');
+    return kpis() + `<div class="grid g2">
+      <section class="card">
+        <h2>Колесо баланса</h2>
+        <p class="lead">XP по сферам за последние 30 дней. Чем ровнее многоугольник, тем гармоничнее жизнь.</p>
+        <div class="chart" id="radar" data-v='${JSON.stringify(last30)}'></div>
+      </section>
+      <section class="card">
+        <h2>Как это работает</h2>
+        <p class="lead" style="margin-bottom:8px">Каждое действие приносит XP своей сфере. У каждой сферы свой уровень.</p>
+        <ul style="margin:0;padding-left:18px;font-size:14px;color:var(--ink-2)">
+          <li><b>Сфера-фокус.</b> Сфера, которая за прошлую неделю набрала меньше всех, получает ×2 XP за привычки. Так игра мягко тянет к балансу.</li>
+          <li><b>Гармония.</b> Особое достижение за то, что все сферы дошли до 3-го уровня.</li>
+          <li>Названия и значки сфер меняются в настройках.</li>
+        </ul>
+      </section>
+      <section class="card wide"><h2>Сферы жизни</h2><div class="spheres" style="margin-top:12px">${cards}</div></section>
+    </div>`;
+  }
+
+  function drawRadar() {
+    const box = document.getElementById('radar');
+    if (!box) return;
+    const v = JSON.parse(box.dataset.v || '{}');
+    const S = state.spheres, N = S.length;
+    const W = Math.min(box.clientWidth || 340, 420), H = W * 0.86;
+    const cx = W / 2, cy = H / 2, R = Math.min(W, H) / 2 - 46;
+    const max = Math.max(1, ...S.map((s) => Math.max(0, v[s.id] || 0)));
+    const pt = (i, r) => { const ang = -Math.PI / 2 + (i / N) * Math.PI * 2; return [cx + Math.cos(ang) * r, cy + Math.sin(ang) * r]; };
+    let g = '';
+    [0.25, 0.5, 0.75, 1].forEach((f) => {
+      g += `<polygon points="${S.map((_, i) => pt(i, R * f).join(',')).join(' ')}" fill="none" stroke="var(--line)"/>`;
+    });
+    S.forEach((s, i) => {
+      const [x2, y2] = pt(i, R), [lx, ly] = pt(i, R + 22);
+      g += `<line x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" stroke="var(--line)"/>`;
+      const anchor = Math.abs(lx - cx) < 4 ? 'middle' : lx > cx ? 'start' : 'end';
+      g += `<text x="${lx}" y="${ly + 4}" text-anchor="${anchor}" style="fill:var(--ink-2);font-size:12px">${s.icon} ${esc(s.name)}</text>`;
+    });
+    const poly = S.map((s, i) => pt(i, R * (Math.max(0, v[s.id] || 0) / max)).join(',')).join(' ');
+    const dots = S.map((s, i) => { const [x, y] = pt(i, R * (Math.max(0, v[s.id] || 0) / max)); return `<circle cx="${x}" cy="${y}" r="5" fill="var(--c1)" stroke="var(--surface)" stroke-width="2" data-tip="${esc(`${s.icon} ${s.name}: ${v[s.id] || 0} XP за 30 дней`)}"/><circle cx="${x}" cy="${y}" r="14" fill="transparent" data-tip="${esc(`${s.icon} ${s.name}: ${v[s.id] || 0} XP за 30 дней`)}"/>`; }).join('');
+    const empty = !S.some((s) => (v[s.id] || 0) > 0);
+    box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="margin:0 auto">${g}
+      ${empty ? `<text x="${cx}" y="${cy + 4}" text-anchor="middle" style="fill:var(--ink-3);font-size:13px">Пока нет данных</text>` : `<polygon points="${poly}" fill="var(--c1)" fill-opacity=".16" stroke="var(--c1)" stroke-width="2" stroke-linejoin="round"/>${dots}`}
+    </svg>`;
+  }
+
+  function viewAwards() {
+    const a = all();
+    const got = ACH.filter(([id]) => state.ach[id]).length;
+    const cards = ACH.map(([id, ic, nm, ds, fn]) => {
+      const done = state.ach[id];
+      const [cur, need] = fn(a);
+      const p = Math.max(0, Math.min(1, cur / need));
+      return `<div class="badge${done ? '' : ' locked'}"><div class="ic">${ic}</div><div class="nm">${nm}</div><div class="ds">${ds}</div>
+        ${done ? `<div class="st">получено ${fmtShort(done)}</div>` : `<div class="bar"><i style="width:${p * 100}%"></i></div><div class="st">${Math.max(0, Math.min(cur, need))} / ${need}</div>`}</div>`;
+    }).join('');
+    return kpis() + `<section class="card"><h2>Достижения · ${got} из ${ACH.length}</h2><p class="lead">Награды за постоянство, рост и баланс.</p><div class="badges">${cards}</div></section>`;
+  }
+
+  function viewSettings() {
+    const opts = (sel) => state.spheres.map((s) => `<option value="${s.id}"${s.id === sel ? ' selected' : ''}>${s.icon} ${esc(s.name)}</option>`).join('');
+    const xpOpts = (sel) => [5, 10, 15, 20, 30].map((v) => `<option value="${v}"${v === sel ? ' selected' : ''}>+${v} XP</option>`).join('');
+    const active = state.habits.filter((h) => !h.archived), archived = state.habits.filter((h) => h.archived);
+    const penOpts = (sel) => PENALTIES.map((v) => `<option value="${v}"${v === sel ? ' selected' : ''}>−${v} XP</option>`).join('');
+    const sbActive = state.setbacks.filter((s) => !s.archived), sbArchived = state.setbacks.filter((s) => s.archived);
+    const sbRow = (s) => `<div class="set-row habit-set">
+        <input type="text" value="${esc(s.name)}" data-bf="name" data-id="${s.id}" maxlength="80">
+        <select data-bf="sphere" data-id="${s.id}">${opts(s.sphere)}</select>
+        <select data-bf="pen" data-id="${s.id}">${penOpts(s.pen)}</select>
+        ${s.archived ? `<button class="btn small" data-act="sbRestore" data-id="${s.id}">Вернуть</button>` : `<button class="btn small" data-act="sbArchive" data-id="${s.id}">В архив</button>`}
+        <input type="text" class="ask" value="${esc(s.fix || '')}" data-bf="fix" data-id="${s.id}" maxlength="100" placeholder="🔁 Чем можно исправить. Пусто — исправить нельзя">
+      </div>`;
+    const habitRow = (h) => `<div class="set-row habit-set">
+        <input type="text" value="${esc(h.name)}" data-hf="name" data-id="${h.id}" maxlength="80">
+        <select data-hf="sphere" data-id="${h.id}">${opts(h.sphere)}</select>
+        <select data-hf="xp" data-id="${h.id}">${xpOpts(h.xp)}</select>
+        ${h.archived ? `<button class="btn small" data-act="restore" data-id="${h.id}">Вернуть</button>` : `<button class="btn small" data-act="archive" data-id="${h.id}">В архив</button>`}
+        <input type="text" class="ask" value="${esc(h.ask || '')}" data-hf="ask" data-id="${h.id}" maxlength="100" placeholder="✎ Вопрос для заметки, например «Что узнал?». Пусто — без заметки">
+      </div>`;
+    return `<div class="grid g2">
+      <section class="card">
+        <h2>Минимум дня</h2>
+        <p class="lead">Сколько XP нужно набрать, чтобы день засчитался как рост (+1%). Начните с малого: важна регулярность.</p>
+        <div class="set-row"><input type="number" min="5" max="500" step="5" value="${state.settings.minXP}" data-sf="minXP" style="width:110px"> XP в день</div>
+        <h2 style="margin-top:18px">Дата начала пути</h2>
+        <p class="lead">С этого дня считается индекс.</p>
+        <div class="set-row"><input type="text" value="${state.start}" data-sf="start" style="width:140px" placeholder="ГГГГ-ММ-ДД"></div>
+      </section>
+      <section class="card">
+        <h2>Сферы жизни</h2>
+        <p class="lead">Переименуйте под себя. Цвета закреплены, чтобы графики оставались читаемыми.</p>
+        ${state.spheres.map((s) => `<div class="set-row"><span class="sw" style="background:${color(s.id)}"></span>
+          <input type="text" class="emoji" value="${esc(s.icon)}" data-pf="icon" data-id="${s.id}" maxlength="4">
+          <input type="text" value="${esc(s.name)}" data-pf="name" data-id="${s.id}" maxlength="30"></div>`).join('')}
+      </section>
+      <section class="card wide">
+        <h2>Привычки</h2>
+        <p class="lead">Изменения сохраняются сразу. Архив скрывает привычку из списка дня, но история и XP остаются.
+          Если у привычки задан вопрос, после отметки под ней появится поле для заметки (+${NOTE_XP} XP). Все заметки собираются во вкладке «Отчёт».</p>
+        ${active.map(habitRow).join('')}
+        <form class="set-row habit-set" id="habitForm" style="margin-top:8px">
+          <input type="text" id="hName" placeholder="Новая привычка" maxlength="80">
+          <select id="hSphere">${opts('health')}</select>
+          <select id="hXP">${xpOpts(10)}</select>
+          <button class="btn primary" type="submit">Добавить</button>
+          <input type="text" class="ask" id="hAsk" maxlength="100" placeholder="✎ Вопрос для заметки (необязательно)">
+        </form>
+        ${archived.length ? `<details style="margin-top:12px"><summary class="muted" style="cursor:pointer">Архив (${archived.length})</summary>${archived.map(habitRow).join('')}</details>` : ''}
+      </section>
+      <section class="card wide">
+        <h2>🔻 Срывы и откаты</h2>
+        <p class="lead">Что отбрасывает вас назад. Штраф снимается с XP дня и сферы. Если указать, чем срыв можно исправить, появится кнопка, которая снимает штраф.</p>
+        ${sbActive.map(sbRow).join('')}
+        <form class="set-row habit-set" id="sbForm" style="margin-top:8px">
+          <input type="text" id="sName" placeholder="Новый срыв, например «Проспал»" maxlength="80">
+          <select id="sSphere">${opts('health')}</select>
+          <select id="sPen">${penOpts(10)}</select>
+          <button class="btn primary" type="submit">Добавить</button>
+          <input type="text" class="ask" id="sFix" maxlength="100" placeholder="🔁 Чем можно исправить (необязательно)">
+        </form>
+        ${sbArchived.length ? `<details style="margin-top:12px"><summary class="muted" style="cursor:pointer">Архив (${sbArchived.length})</summary>${sbArchived.map(sbRow).join('')}</details>` : ''}
+      </section>
+      <section class="card wide">
+        <h2>Данные</h2>
+        <p class="lead">Всё хранится только в этом браузере. Чтобы не потерять многолетнюю историю, иногда сохраняйте резервную копию.</p>
+        <div class="row">
+          <button class="btn" data-act="export">⬇ Сохранить копию (JSON)</button>
+          ${canShareFiles() ? '<button class="btn" data-act="shareBackup">📤 Отправить копию (Telegram, почта, диск)</button>' : ''}
+          <button class="btn" data-act="import">⬆ Загрузить из копии</button>
+          <button class="btn danger" data-act="reset">Начать всё заново</button>
+          <input type="file" id="importFile" accept="application/json,.json" hidden>
+        </div>
+      </section>
+    </div>`;
+  }
+
+  // ---------- отрисовка ----------
+  const main = document.getElementById('main');
+  // статус дня на экране: с ним сравниваем после изменения, чтобы поймать момент «+1%»
+  let shown = { k: null, s: null };
+  function render() {
+    shown = { k: viewDate, s: calcFor(viewDate).status };
+    const views = { today: viewToday, goals: viewGoals, progress: viewProgress, report: viewReport, spheres: viewSpheres, awards: viewAwards, settings: viewSettings };
+    if (!views[view]) view = 'today';
+    // запомнить поле ввода в фокусе, чтобы вернуть его после перерисовки
+    const ae = document.activeElement;
+    let fkey = null, sel = null;
+    if (ae && main.contains(ae) && /INPUT|TEXTAREA|SELECT/.test(ae.tagName)) {
+      fkey = ae.id ? '#' + ae.id : ae.dataset.field ? `[data-field="${ae.dataset.field}"]${ae.dataset.id ? `[data-id="${ae.dataset.id}"]` : ''}` : null;
+      try { sel = [ae.selectionStart, ae.selectionEnd]; } catch (e) {}
+    }
+    main.innerHTML = views[view]();
+    if (fkey) {
+      const el = main.querySelector(fkey);
+      if (el) { el.focus(); try { if (sel && sel[0] != null) el.setSelectionRange(sel[0], sel[1]); } catch (e) {} }
+    }
+    document.querySelectorAll('#tabs button').forEach((b) => b.classList.toggle('on', b.dataset.v === view));
+    drawGrowth(); drawHeat(); drawRadar(); renderNotes();
+    hideTip();
+  }
+
+  // ---------- тема ----------
+  let theme = 'auto';
+  try { theme = localStorage.getItem(KEY + '.theme') || 'auto'; } catch (e) {}
+  function applyTheme() {
+    if (theme === 'auto') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', theme);
+    // цвет системной панели телефона под выбранную тему
+    document.querySelectorAll('meta[name="theme-color"]').forEach((m) => {
+      const dark = theme === 'auto' ? m.media.includes('dark') : theme === 'dark';
+      m.content = dark ? '#121211' : '#f4f3ef';
+    });
+    const b = document.getElementById('themeBtn');
+    b.textContent = theme === 'auto' ? '◐' : theme === 'light' ? '☀' : '☾';
+    b.title = 'Тема: ' + (theme === 'auto' ? 'как в системе' : theme === 'light' ? 'светлая' : 'тёмная');
+  }
+
+  // ---------- действия ----------
+  function afterChange(k, el) {
+    const before = shown.k === k ? shown.s : null;
+    save();
+    const after = calcFor(k).status;
+    if (before !== 'grow' && after === 'grow') {
+      const r = el ? el.getBoundingClientRect() : { left: innerWidth / 2, top: innerHeight / 2, width: 0 };
+      burst(r.left + r.width / 2, r.top);
+      const yx = k > state.start ? calcFor(addDays(k, -1)).xp : 0;
+      toast(calcFor(k).xp > yx && yx > 0 ? '🏆 +1%! Сегодня вы лучше, чем вчера' : '✅ +1%! Минимум дня выполнен');
+    }
+    render();
+    checkAch(false);
+  }
+  // поздравление, если цель только что достигнута
+  function goalCelebrate(g, wasDone, el) {
+    const info = goalInfo(g);
+    if (wasDone || !info.doneAt) return;
+    const [ic, txt] = MEDALS[info.medal];
+    const r = el && el.isConnected ? el.getBoundingClientRect() : { left: innerWidth / 2, top: innerHeight / 2, width: 0 };
+    burst(r.left + r.width / 2, r.top, ['🏅', '🎯', '✨', '🎉']);
+    setTimeout(() => toast(`${ic} Цель «${g.title}» достигнута ${txt}! +${GOAL_DONE_XP} XP`), 400);
+  }
+  const backupFile = () => new File([JSON.stringify(state, null, 2)], `plus-one-percent-${todayKey()}.json`, { type: 'application/json' });
+  const canShareFiles = () => {
+    try { return !!(navigator.canShare && navigator.canShare({ files: [new File(['{}'], 'x.json', { type: 'application/json' })] })); } catch (e) { return false; }
+  };
+  const toggleIn = (arr, id) => (arr.includes(id) ? arr.filter((x) => x !== id) : [...arr, id]);
+  const ensureStart = (k) => { if (k < state.start) state.start = k; };
+
+  const actions = {
+    view: (el) => { view = el.dataset.v; try { localStorage.setItem(KEY + '.view', view); } catch (e) {} render(); window.scrollTo(0, 0); },
+    prev: () => { viewDate = addDays(viewDate, -1); render(); },
+    next: () => { viewDate = addDays(viewDate, 1); render(); },
+    today: () => { viewDate = todayKey(); render(); },
+    habit: (el) => { const d = dayMut(viewDate); ensureStart(viewDate); d.h = toggleIn(d.h || [], el.dataset.id); afterChange(viewDate, el); },
+    quest: (el) => { const d = dayMut(viewDate); ensureStart(viewDate); d.q = toggleIn(d.q || [], el.dataset.id); afterChange(viewDate, el); },
+    sb: (el) => {
+      const d = dayMut(viewDate), id = el.dataset.id;
+      ensureStart(viewDate);
+      d.s = { ...(d.s || {}) };
+      if (d.s[id]) delete d.s[id];
+      else { d.s[id] = { fix: false, note: '' }; toast(`🔻 −${sbById(id).pen} XP. Честный счёт — уже шаг вперёд. Разберите, что случилось, и штраф уменьшится вдвое.`); }
+      afterChange(viewDate, el);
+    },
+    sbFix: (el) => {
+      const r = day(viewDate).s[el.dataset.id];
+      r.fix = !r.fix;
+      if (r.fix) toast('🔁 Штраф снят. Исправить ошибку — тоже рост.');
+      afterChange(viewDate, el);
+    },
+    reroll: () => { const d = dayMut(viewDate); d.reroll = (d.reroll || 0) + 1; save(); render(); },
+    rest: () => {
+      const d = dayMut(viewDate); ensureStart(viewDate); d.rest = !d.rest;
+      if (d.rest) toast('🛌 Отдыхайте. Восстановление тоже часть роста.');
+      afterChange(viewDate);
+    },
+    delAction: (el) => { const d = dayMut(viewDate); d.a = (d.a || []).filter((a) => a.id !== el.dataset.id); afterChange(viewDate); },
+    archive: (el) => { habitById(el.dataset.id).archived = true; save(); render(); },
+    restore: (el) => { habitById(el.dataset.id).archived = false; save(); render(); },
+    goalTpl: (el) => {
+      goalDraft = goalTemplate(el.dataset.t); render();
+      const f = document.getElementById('goalForm'); if (f) f.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    },
+    goalCancel: () => { goalDraft = null; render(); },
+    goalStep: (el) => {
+      const g = goalById(el.dataset.id), was = !!goalInfo(g).doneAt;
+      g.log = { ...(g.log || {}) };
+      if (g.log[viewDate]) delete g.log[viewDate]; else g.log[viewDate] = g.type === 'sum' ? g.step : true;
+      afterChange(viewDate, el); goalCelebrate(g, was, el);
+    },
+    goalDrop: (el) => { goalById(el.dataset.id).status = 'dropped'; save(); render(); toast('Цель отложена. Её история и XP сохранены.'); },
+    goalRestore: (el) => { goalById(el.dataset.id).status = 'active'; save(); render(); },
+    goalDelete: (el) => {
+      const g = goalById(el.dataset.id);
+      if (!confirm(`Удалить цель «${g.title}» вместе с историей? XP за её шаги тоже пропадёт. Чтобы сохранить историю, лучше нажать «Отказаться».`)) return;
+      state.goals = state.goals.filter((x) => x !== g); save(); render();
+    },
+    goalHabit: (el) => {
+      const g = goalById(el.dataset.id);
+      state.habits.push({ id: 'h' + uid(), name: g.habit, sphere: g.sphere, xp: 10, ask: '', archived: false });
+      save(); render(); toast(`📌 Привычка «${g.habit}» добавлена. Теперь результат нужно удержать.`);
+    },
+    sbArchive: (el) => { sbById(el.dataset.id).archived = true; save(); render(); },
+    sbRestore: (el) => { sbById(el.dataset.id).archived = false; save(); render(); },
+    theme: () => { theme = theme === 'auto' ? 'light' : theme === 'light' ? 'dark' : 'auto'; try { localStorage.setItem(KEY + '.theme', theme); } catch (e) {} applyTheme(); render(); },
+    export: () => {
+      const f = backupFile();
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(f); a.download = f.name;
+      a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    },
+    // на телефоне: отправить копию через системное меню «Поделиться»
+    shareBackup: async () => {
+      try { await navigator.share({ files: [backupFile()], title: 'Копия «+1%»' }); }
+      catch (e) { if (e.name !== 'AbortError') toast('Не удалось отправить. Используйте «Сохранить копию».'); }
+    },
+    install: async () => {
+      if (!installPrompt) return;
+      installPrompt.prompt();
+      const { outcome } = await installPrompt.userChoice;
+      installPrompt = null;
+      document.getElementById('installBtn').hidden = true;
+      if (outcome === 'accepted') toast('📲 Приложение установлено. Ищите значок «+1%» на рабочем столе.');
+    },
+    import: () => document.getElementById('importFile').click(),
+    repPeriod: (el) => { rep.period = Number(el.dataset.p); render(); },
+    repTag: (el) => { rep.tag = rep.tag === el.dataset.tag ? null : el.dataset.tag; render(); },
+    repNotes: (el) => { rep.habit = el.dataset.id; rep.q = ''; render(); document.getElementById('notesCard').scrollIntoView({ behavior: 'smooth' }); },
+    repRow: (el) => { rep.open[el.dataset.k] = !rep.open[el.dataset.k]; render(); },
+    goDay: (el) => { viewDate = el.dataset.k; actions.view({ dataset: { v: 'today' } }); },
+    csv: () => exportCSV(),
+    addTag: (el) => {
+      const ta = document.querySelector('textarea[data-field="journal"]');
+      if (!ta) return;
+      const tg = el.dataset.tag;
+      if (!tagsOf(ta.value).includes(tg)) ta.value = (ta.value.trimEnd() + ' ' + tg).trimStart();
+      dayMut(viewDate).j = ta.value; ensureStart(viewDate);
+      afterChange(viewDate, el);
+    },
+    reset: () => {
+      if (!confirm('Удалить всю историю, достижения и настройки и начать путь заново?')) return;
+      state = fresh(); viewDate = todayKey(); save(); render(); toast('Новый путь начинается сегодня 🌱');
+    },
+  };
+
+  document.addEventListener('click', (e) => {
+    const el = e.target.closest('[data-act]');
+    if (el && actions[el.dataset.act] && !el.disabled) actions[el.dataset.act](el, e);
+  });
+
+  document.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (e.target.id === 'actionForm') {
+      const text = document.getElementById('aText').value.trim();
+      if (!text) return;
+      const d = dayMut(viewDate); ensureStart(viewDate);
+      d.a = [...(d.a || []), { id: uid(), text, sphere: document.getElementById('aSphere').value, xp: Number(document.getElementById('aXP').value) }];
+      afterChange(viewDate, e.target.querySelector('button'));
+    } else if (e.target.id === 'habitForm') {
+      const name = document.getElementById('hName').value.trim();
+      if (!name) return;
+      state.habits.push({ id: 'h' + uid(), name, sphere: document.getElementById('hSphere').value, xp: Number(document.getElementById('hXP').value), ask: document.getElementById('hAsk').value.trim(), archived: false });
+      save(); render(); toast('Привычка добавлена');
+    } else if (e.target.id === 'goalForm') {
+      const r = draftParsed();
+      if (r.err) { toast(r.err); return; }
+      const g = { id: 'g' + uid(), ...r.ok, start: todayKey(), status: 'active', log: {} };
+      state.goals.push(g);
+      if (goalDraft.archiveHabit && goalDraft.archiveOn) { const h = habitById(goalDraft.archiveHabit); if (h) h.archived = true; }
+      goalDraft = null; save(); render();
+      toast(`🎯 Цель поставлена. Её задание уже ждёт на экране «Сегодня».`);
+    } else if (e.target.id === 'sbForm') {
+      const name = document.getElementById('sName').value.trim();
+      if (!name) return;
+      state.setbacks.push({ id: 's' + uid(), name, sphere: document.getElementById('sSphere').value, pen: Number(document.getElementById('sPen').value), fix: document.getElementById('sFix').value.trim(), archived: false });
+      save(); render(); toast('Срыв добавлен в список');
+    }
+  });
+
+  // дневник сохраняется на лету, без перерисовки, чтобы не сбивать курсор
+  document.addEventListener('input', (e) => {
+    if (e.target.dataset.field === 'journal') { dayMut(viewDate).j = e.target.value; ensureStart(viewDate); save(); }
+    if (e.target.dataset.gf && goalDraft) {
+      goalDraft[e.target.dataset.gf] = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+      const pv = document.getElementById('goalPreview'); if (pv) pv.innerHTML = goalPreview();
+    }
+    if (e.target.dataset.field === 'sbnote') {
+      const r = (day(viewDate).s || {})[e.target.dataset.id];
+      if (r) { r.note = e.target.value; save(); }
+    }
+    if (e.target.dataset.field === 'note') {
+      const d = dayMut(viewDate);
+      d.n = { ...(d.n || {}), [e.target.dataset.id]: e.target.value };
+      save();
+    }
+    if (e.target.id === 'noteSearch') { rep.q = e.target.value; renderNotes(); }
+  });
+  document.addEventListener('change', (e) => {
+    const t = e.target;
+    // с задержкой: если поле потеряло фокус из-за щелчка по кнопке, щелчок успеет сработать до перерисовки
+    if (t.dataset.gf) return; // черновик цели обновляется на лету в обработчике input
+    if (t.dataset.field === 'goalval') {
+      const g = goalById(t.dataset.id), was = !!goalInfo(g).doneAt, v = nval(t.value);
+      g.log = { ...(g.log || {}) };
+      if (t.value.trim() === '') delete g.log[viewDate];
+      else if (isFinite(v)) g.log[viewDate] = v;
+      else { toast('Введите число, например 94,5'); render(); return; }
+      const k = viewDate;
+      setTimeout(() => { afterChange(k); goalCelebrate(g, was); }, 200);
+      return;
+    }
+    if (t.dataset.prof) {
+      const f = t.dataset.prof, v = t.value.trim();
+      if (['wake', 'bed'].includes(f)) {
+        if (v && toMin(v) === null) { toast('Время пишется как ЧЧ:ММ, например 07:00'); render(); return; }
+        state.profile[f] = v ? fmtMin(toMin(v)) : '';
+      } else {
+        if (v && !(nval(v) > 0)) { toast('Нужно положительное число'); render(); return; }
+        state.profile[f] = v ? nval(v) : '';
+      }
+      save(); render(); return;
+    }
+    if (t.dataset.field === 'journal' || t.dataset.field === 'note' || t.dataset.field === 'sbnote') { const k = viewDate; setTimeout(() => afterChange(k), 200); return; }
+    if (t.id === 'noteHabit') { rep.habit = t.value; render(); return; }
+    if (t.dataset.hf) {
+      const h = habitById(t.dataset.id);
+      if (t.dataset.hf === 'name') { if (t.value.trim()) h.name = t.value.trim(); }
+      else h[t.dataset.hf] = t.dataset.hf === 'xp' ? Number(t.value) : t.dataset.hf === 'ask' ? t.value.trim() : t.value;
+      save(); render();
+    } else if (t.dataset.bf) {
+      const s = sbById(t.dataset.id), f = t.dataset.bf;
+      if (f === 'name') { if (t.value.trim()) s.name = t.value.trim(); }
+      else s[f] = f === 'pen' ? Number(t.value) : f === 'fix' ? t.value.trim() : t.value;
+      save(); render();
+    } else if (t.dataset.pf) {
+      const s = state.spheres.find((x) => x.id === t.dataset.id);
+      if (t.value.trim()) s[t.dataset.pf] = t.value.trim();
+      save(); render();
+    } else if (t.dataset.sf === 'minXP') {
+      const v = Math.round(Number(t.value));
+      if (v >= 5 && v <= 500) { state.settings.minXP = v; save(); }
+      render();
+    } else if (t.dataset.sf === 'start') {
+      if (/^\d{4}-\d{2}-\d{2}$/.test(t.value) && !isNaN(dateOf(t.value)) && t.value <= todayKey()) { state.start = t.value; save(); toast('Дата начала изменена'); }
+      else toast('Формат даты: ГГГГ-ММ-ДД, не позже сегодня');
+      render();
+    } else if (t.id === 'importFile' && t.files[0]) {
+      t.files[0].text().then((txt) => {
+        const data = JSON.parse(txt);
+        if (!data || typeof data.days !== 'object' || !Array.isArray(data.habits) || !Array.isArray(data.spheres)) throw new Error('bad');
+        if (!confirm('Заменить текущие данные содержимым файла?')) return;
+        state = { ...fresh(), ...data, settings: { ...fresh().settings, ...data.settings } };
+        migrate();
+        save(); render(); toast('Данные загружены');
+      }).catch(() => toast('Не удалось прочитать файл: это не копия «+1%»'));
+    }
+  });
+
+  let rt;
+  window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { drawGrowth(); drawHeat(); drawRadar(); }, 150); });
+  // смена суток, пока страница открыта
+  let lastToday = todayKey();
+  setInterval(() => { if (todayKey() !== lastToday) { if (viewDate === lastToday) viewDate = todayKey(); lastToday = todayKey(); calc = null; gcache = {}; render(); } }, 60000);
+
+  // ---------- приложение (PWA) ----------
+  let installPrompt = null;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault(); installPrompt = e;
+    document.getElementById('installBtn').hidden = false;
+  });
+  window.addEventListener('appinstalled', () => { installPrompt = null; document.getElementById('installBtn').hidden = true; });
+  // сервис-воркер работает только по HTTPS или на localhost
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+  // просим браузер не очищать данные при нехватке места
+  if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+
+  applyTheme();
+  render();
+  checkAch(true);
+})();
+</script>
+</body>
+</html>
