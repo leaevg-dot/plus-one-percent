@@ -412,7 +412,55 @@
     ['q21', 'Выброси или отдай 5 ненужных вещей', 'home'], ['q22', 'Приготовь новое блюдо', 'home'],
     ['q23', 'Разбери один ящик или полку', 'home'], ['q24', 'Пройди новым маршрутом', 'soul'],
   ].map(([id, text, sphere]) => ({ id, text, sphere, xp: 15 }));
-  const QUEST_BY_ID = Object.fromEntries(QUESTS.map((q) => [q.id, q]));
+  // ---------- режим «Школьник» ----------
+  // id сфер те же (на них ссылаются шаблоны и история), меняются названия и значки
+  const SCHOOL_SPHERES = [
+    { id: 'health', name: 'Здоровье и спорт', icon: '💪', slot: 1 },
+    { id: 'mind', name: 'Знания', icon: '📖', slot: 2 },
+    { id: 'work', name: 'Учёба', icon: '📚', slot: 3 },
+    { id: 'people', name: 'Семья и друзья', icon: '❤️', slot: 4 },
+    { id: 'money', name: 'Карманные деньги', icon: '💰', slot: 5 },
+    { id: 'soul', name: 'Настроение', icon: '🙂', slot: 6 },
+    { id: 'create', name: 'Хобби', icon: '🎨', slot: 7 },
+    { id: 'home', name: 'Самостоятельность', icon: '🧹', slot: 8 },
+  ];
+  const SCHOOL_HABITS = [
+    ['Сделал домашнее задание', 'work', 15, 'Что было самым трудным?'], ['Собрал портфель с вечера', 'work', 5, ''],
+    ['Повторил материал к контрольной', 'work', 10, 'Какую тему повторил?'],
+    ['Читал 20 минут', 'mind', 10, 'Что читал? Что запомнилось?'], ['Учил английский 15 минут', 'mind', 10, 'Какие слова или правила выучил?'],
+    ['Зарядка или тренировка', 'health', 10, ''], ['Час на улице', 'health', 10, ''], ['Лёг спать до 22:00', 'health', 10, ''],
+    ['Помог по дому', 'home', 10, 'Чем помог?'], ['Убрал свою комнату', 'home', 5, ''],
+    ['Провёл время с семьёй без телефона', 'people', 10, 'Чем занимались?'],
+    ['Кружок или хобби 30 минут', 'create', 10, 'Что получилось?'],
+    ['Телефон и игры не больше 2 часов', 'soul', 10, ''],
+    ['Записал карманные расходы', 'money', 5, ''],
+  ].map(([name, sphere, xp, ask], i) => ({ id: 'k' + i, name, sphere, xp, ask, archived: false }));
+  const SCHOOL_SETBACKS = [
+    ['Не сделал домашку', 'work', 15, 'Сделал на следующий день'], ['Получил двойку', 'work', 10, 'Исправил оценку'],
+    ['Опоздал в школу', 'work', 5, ''], ['Забыл тетрадь или форму', 'work', 5, ''],
+    ['Списал вместо того, чтобы разобраться', 'work', 10, 'Разобрался сам'],
+    ['Больше 3 часов в играх и телефоне', 'soul', 10, ''], ['Лёг спать после 23:00', 'health', 10, ''],
+    ['Пропустил тренировку или кружок', 'create', 10, 'Позанимался дома'],
+    ['Нагрубил родителям', 'people', 10, 'Извинился и поговорил'], ['Поссорился с другом', 'people', 5, 'Помирились'],
+    ['Потратил карманные деньги впустую', 'money', 10, ''], ['Не убрал за собой', 'home', 5, 'Убрал'],
+  ].map(([name, sphere, pen, fix], i) => ({ id: 'ks' + i, name, sphere, pen, fix, archived: false }));
+  const SCHOOL_QUESTS = [
+    ['Сделай зарядку 10 минут', 'health'], ['Пройди пешком вместо транспорта', 'health'], ['Весь день пей воду вместо газировки', 'health'],
+    ['Выучи 5 новых английских слов', 'mind'], ['Узнай интересный факт и расскажи родителям', 'mind'], ['Прочитай 10 страниц сверх плана', 'mind'],
+    ['Реши одну задачу повышенной сложности', 'work'], ['Спроси учителя о теме, которую не понял', 'work'], ['Сделай домашку сразу после школы', 'work'],
+    ['Позвони бабушке или дедушке', 'people'], ['Скажи однокласснику что-то приятное', 'people'], ['Помоги брату, сестре или другу с уроками', 'people'],
+    ['Отложи часть карманных денег', 'money'], ['Проживи день без лишних покупок', 'money'],
+    ['Час без телефона', 'soul'], ['Запиши 3 хороших события за день', 'soul'], ['Перед сном 5 минут спокойно подыши', 'soul'],
+    ['Нарисуй, собери или сочини что-нибудь', 'create'], ['Научись новому приёму в своём хобби', 'create'], ['Сделай подарок своими руками', 'create'],
+    ['Помоги приготовить ужин', 'home'], ['Помой посуду без напоминания', 'home'], ['Разбери рюкзак и рабочий стол', 'home'], ['Приготовь одежду на завтра', 'home'],
+  ].map(([text, sphere], i) => ({ id: 'kq' + (i + 1), text, sphere, xp: 15 }));
+
+  // в истории могут быть задания обоих режимов
+  const QUEST_BY_ID = Object.fromEntries([...QUESTS, ...SCHOOL_QUESTS].map((q) => [q.id, q]));
+  const MODES = {
+    adult: { name: '👤 Взрослый', spheres: DEFAULT_SPHERES, habits: DEFAULT_HABITS, setbacks: DEFAULT_SETBACKS, quests: QUESTS, minXP: 30, sleepH: 8, bed: '23:30' },
+    school: { name: '🎒 Школьник', spheres: SCHOOL_SPHERES, habits: SCHOOL_HABITS, setbacks: SCHOOL_SETBACKS, quests: SCHOOL_QUESTS, minXP: 25, sleepH: 9, bed: '22:30' },
+  };
 
   const TITLES = ['Новичок', 'Ученик', 'Искатель', 'Практик', 'Подмастерье', 'Мастер', 'Эксперт', 'Наставник', 'Мудрец', 'Легенда'];
   const ACTION_SIZES = [[5, 'мелочь'], [10, 'обычное дело'], [20, 'серьёзное'], [40, 'подвиг']];
@@ -426,7 +474,8 @@
     spheres: DEFAULT_SPHERES.map((s) => ({ ...s })),
     habits: DEFAULT_HABITS.map((h) => ({ ...h })),
     setbacks: DEFAULT_SETBACKS.map((s) => ({ ...s })),
-    goals: [], profile: { age: '', height: '', weight: '', wake: '07:00', bed: '23:30', sleepH: 8 },
+    goals: [], profile: { age: '', grade: '', height: '', weight: '', wake: '07:00', bed: '23:30', sleepH: 8 },
+    mode: null, // null — ещё не выбран: покажем экран выбора
     days: {}, ach: {}
   });
   let state;
@@ -440,9 +489,31 @@
     });
     if (!Array.isArray(state.setbacks)) state.setbacks = DEFAULT_SETBACKS.map((s) => ({ ...s }));
     if (!Array.isArray(state.goals)) state.goals = [];
-    state.profile = { age: '', height: '', weight: '', wake: '07:00', bed: '23:30', sleepH: 8, ...(state.profile || {}) };
+    state.profile = { age: '', grade: '', height: '', weight: '', wake: '07:00', bed: '23:30', sleepH: 8, ...(state.profile || {}) };
+    // до появления режимов: у кого уже есть история — взрослый режим, новым — экран выбора
+    if (state.mode === undefined) state.mode = (Object.keys(state.days).length || state.goals.length) ? 'adult' : null;
   }
   migrate();
+
+  // применить набор режима: сферы переименовываются, привычки и срывы другого набора уходят в архив
+  // (история и XP сохраняются), свои добавляются или возвращаются из архива
+  function applyMode(mode) {
+    freezeFocus();
+    const p = MODES[mode];
+    state.mode = mode;
+    state.spheres = p.spheres.map((s) => ({ ...s }));
+    const sync = (list, preset) => {
+      const ids = new Set(preset.map((x) => x.id));
+      list.forEach((x) => { if (!ids.has(x.id)) x.archived = true; });
+      preset.forEach((x) => { const have = list.find((y) => y.id === x.id); if (have) have.archived = false; else list.push({ ...x }); });
+    };
+    sync(state.habits, p.habits);
+    sync(state.setbacks, p.setbacks);
+    state.settings.minXP = p.minXP;
+    state.profile.sleepH = p.sleepH;
+    state.profile.bed = p.bed;
+  }
+  const isSchool = () => state.mode === 'school';
   const save = () => { calc = null; gcache = {}; try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
 
   let view = 'today';
@@ -542,6 +613,18 @@
     return by;
   }
 
+  // Запомнить сферу-фокус во всех днях с отметками (кроме будущих), где она ещё не сохранена.
+  // Вызывается при запуске и перед любым изменением состава привычек.
+  function freezeFocus() {
+    const t = todayKey();
+    let changed = false;
+    Object.keys(state.days).forEach((k) => {
+      const d = state.days[k];
+      if (k <= t && d.f === undefined && (d.h || []).length) { d.f = focusSphere(k); changed = true; }
+    });
+    if (changed) save();
+  }
+
   // Самая отстающая сфера за 7 предыдущих дней: её привычки дают ×2
   function focusSphere(k) {
     const active = state.spheres.filter((s) => state.habits.some((h) => !h.archived && h.sphere === s.id));
@@ -558,7 +641,8 @@
   }
 
   function dayCalc(k) {
-    const d = day(k), focus = focusSphere(k), by = {};
+    // сфера-фокус запоминается в дне (d.f), чтобы смена списка привычек не меняла прошлые дни
+    const d = day(k), focus = d.f !== undefined ? d.f : focusSphere(k), by = {};
     let xp = 0, count = 0;
     const add = (s, v) => { by[s] = (by[s] || 0) + v; xp += v; };
     (d.h || []).forEach((id) => {
@@ -966,7 +1050,7 @@
   }
   function pickQuests(k) {
     const r = rng(k + ':' + (day(k).reroll || 0));
-    const pool = [...QUESTS];
+    const pool = [...MODES[state.mode || 'adult'].quests];
     for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
     return pool.slice(0, 3);
   }
@@ -1384,23 +1468,51 @@
     el.click(); setTimeout(() => URL.revokeObjectURL(el.href), 1000);
   }
 
+  function viewWelcome() {
+    return `<section class="card welcome">
+      <h2 style="font-size:20px">Добро пожаловать в «+1%» 👋</h2>
+      <p class="lead" style="font-size:14px">Каждый день становиться чуть лучше, чем вчера: привычки, цели, честный счёт срывов и индекс роста.
+        Если каждый день расти на 1%, за год получится в 37 раз больше.</p>
+      <h2 style="margin-top:6px">Кто будет пользоваться приложением?</h2>
+      <div class="tpls" style="margin-top:10px">
+        <button class="tpl" data-act="chooseMode" data-m="adult"><b>👤 Взрослый</b><span>Работа, здоровье, финансы, близкие. Цели: режим сна, вес, накопления</span></button>
+        <button class="tpl" data-act="chooseMode" data-m="school"><b>🎒 Школьник</b><span>Учёба, спорт, семья и друзья, хобби, карманные деньги. Цели: оценки, рекорды, мечта</span></button>
+      </div>
+      <p class="muted" style="font-size:13px;margin-top:14px">Режим можно сменить в настройках.
+        Уже пользовались приложением на другом устройстве? <button class="btn small" data-act="import">⬆ Загрузить из копии</button></p>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
+    </section>`;
+  }
+
   // ---------- вкладка «Цели» ----------
   let goalDraft = null;
   const GOAL_KIND = { time: '⏱️ по времени', sum: '💰 накопление', measure: '📏 замер' };
-  const GOAL_TPLS = [
-    ['sleep', '😴', 'Режим сна', 'Сдвигать отбой понемногу, чтобы высыпаться к подъёму'],
-    ['weight', '⚖️', 'Снизить вес', 'Замер каждый день, план и прогноз даты'],
-    ['money', '💰', 'Накопить сумму', 'Откладывать каждый день равную часть'],
-    ['time', '⏱️', 'Своё время', 'Ступенчато сдвинуть подъём, начало работы и т. п.'],
-    ['sum', '📚', 'Своё накопление', 'Страницы, километры, часы практики'],
-    ['measure', '📏', 'Свой замер', 'Пульс, давление, обхват — любой показатель'],
-  ];
+  const GOAL_TPLS = {
+    adult: [
+      ['sleep', '😴', 'Режим сна', 'Сдвигать отбой понемногу, чтобы высыпаться к подъёму'],
+      ['weight', '⚖️', 'Снизить вес', 'Замер каждый день, план и прогноз даты'],
+      ['money', '💰', 'Накопить сумму', 'Откладывать каждый день равную часть'],
+      ['time', '⏱️', 'Своё время', 'Ступенчато сдвинуть подъём, начало работы и т. п.'],
+      ['sum', '📚', 'Своё накопление', 'Страницы, километры, часы практики'],
+      ['measure', '📏', 'Свой замер', 'Пульс, давление, обхват — любой показатель'],
+    ],
+    // для школьника нет целей на вес: детям это не нужно
+    school: [
+      ['sleep', '😴', 'Режим сна', 'Ложиться понемногу раньше, чтобы высыпаться перед школой'],
+      ['grade', '📝', 'Подтянуть оценку', 'Средний балл по предмету: вносите, когда он меняется'],
+      ['sport', '💪', 'Спортивный рекорд', 'Подтягивания, отжимания, прыжки — шаг за шагом'],
+      ['dream', '💰', 'Накопить на мечту', 'Откладывать часть карманных денег'],
+      ['sum', '📚', 'Прочитать книгу', 'По несколько страниц каждый день'],
+      ['time', '⏱️', 'Своё время', 'Например, вставать раньше без будильника родителей'],
+      ['measure', '📏', 'Свой замер', 'Любой показатель, который хочется улучшить'],
+    ],
+  };
   const nval = (x) => Number(String(x ?? '').replace(',', '.').replace(/\s/g, ''));
   const hm = (m) => `${Math.floor(m / 60)} ч${m % 60 ? ' ' + (m % 60) + ' мин' : ''}`;
 
   function goalTemplate(id) {
     const p = state.profile;
-    const wake = toMin(p.wake) ?? toMin('07:00'), sleepH = nval(p.sleepH) || 8;
+    const wake = toMin(p.wake) ?? toMin('07:00'), sleepH = nval(p.sleepH) || MODES[state.mode || 'adult'].sleepH;
     if (id === 'sleep') {
       const to = fmtMin(wake - sleepH * 60);
       const bedHabit = state.habits.find((h) => !h.archived && /спать до/i.test(h.name));
@@ -1415,7 +1527,11 @@
     }
     if (id === 'money') return { tpl: id, type: 'sum', title: 'Накопить 5000 ₽', sphere: 'money', unit: '₽', to: 5000, days: 10, label: 'Отложить {v} на цель', habit: 'Отложил немного денег' };
     if (id === 'time') return { tpl: id, type: 'time', title: `Вставать в ${fmtMin(wake - 30)}`, sphere: 'health', from: fmtMin(wake), to: fmtMin(wake - 30), days: 10, label: 'Встать в {v}', habit: `Встал в ${fmtMin(wake - 30)}` };
-    if (id === 'sum') return { tpl: id, type: 'sum', title: 'Прочитать 300 страниц', sphere: 'mind', unit: 'стр.', to: 300, days: 30, label: 'Прочитать {v}', habit: '' };
+    if (id === 'sum') return { tpl: id, type: 'sum', title: isSchool() ? 'Прочитать книгу: 300 страниц' : 'Прочитать 300 страниц', sphere: 'mind', unit: 'стр.', to: 300, days: 30, label: 'Прочитать {v}', habit: isSchool() ? 'Читал 20 минут' : '' };
+    if (id === 'grade') return { tpl: id, type: 'measure', title: 'Средний балл по математике: 4,5', sphere: 'work', unit: 'балл', from: 3.8, to: 4.5, days: 60, label: 'Средний балл сейчас', habit: '' };
+    if (id === 'sport') return { tpl: id, type: 'measure', title: 'Подтянуться 10 раз', sphere: 'health', unit: 'раз', from: 3, to: 10, days: 60, label: 'Подтянулся сегодня, раз', habit: 'Тренировка подтягиваний' };
+    if (id === 'dream') return { tpl: id, type: 'sum', title: 'Накопить на мечту: 3000 ₽', sphere: 'money', unit: '₽', to: 3000, days: 30, label: 'Отложить {v} на мечту', habit: 'Отложил часть карманных' };
+    if (isSchool()) return { tpl: 'measure', type: 'measure', title: 'Пробежать 1 км быстрее 5 минут', sphere: 'health', unit: 'мин', from: 6, to: 5, days: 45, label: 'Время на 1 км', habit: '' };
     return { tpl: 'measure', type: 'measure', title: 'Пульс в покое до 65', sphere: 'health', unit: 'уд/мин', from: 75, to: 65, days: 60, label: 'Пульс утром', habit: '' };
   }
 
@@ -1453,14 +1569,14 @@
     if (g.type === 'time') {
       const a = toMin(g.from), b = toMin(g.to), per = Math.abs(b - a) / g.days;
       const steps = [1, 2, 3].filter((i) => i < g.days).map((i) => fmtMin(goalStepVal(g, i)));
-      if (goalDraft.tpl === 'sleep') lines.push(`Подъём ${state.profile.wake || '07:00'} − ${nval(state.profile.sleepH) || 8} ч сна = отбой в <b>${g.to}</b>.`);
+      if (goalDraft.tpl === 'sleep') lines.push(`Подъём ${state.profile.wake || '07:00'} − ${nval(state.profile.sleepH) || MODES[state.mode || 'adult'].sleepH} ч сна = отбой в <b>${g.to}</b>.`);
       lines.push(`Каждый день на <b>${num(per, per % 1 ? 1 : 0)} мин ${b < a ? 'раньше' : 'позже'}</b>: ${steps.join(', ')}${steps.length ? ' … ' : ''}${g.to}.`);
       if (per > 15) lines.push('<span class="warn">⚠️ Больше 15 минут за день — организму тяжело перестроиться. Лучше увеличить срок.</span>');
     } else if (g.type === 'sum') {
       lines.push(`По <b>${fmtNum(g.step)} ${esc(g.unit)}</b> в день. Задание дня: «${esc(goalStepText(g, fmtNum(g.step) + ' ' + g.unit))}».`);
     } else {
       const perWeek = Math.abs(g.to - g.from) / g.days * 7;
-      lines.push(`Примерно <b>${num(perWeek, perWeek < 10 ? 2 : 0)} ${esc(g.unit)} в неделю</b>. Каждый день вносите замер, и будет виден план и прогноз даты.`);
+      lines.push(`Примерно <b>${num(perWeek, perWeek < 10 ? 2 : 0)} ${esc(g.unit)} в неделю</b>. Вносите новое значение, когда оно меняется: будет виден план и прогноз даты.`);
       if (/кг/i.test(g.unit) && g.to < g.from) {
         const safe = g.from * 0.01;
         if (perWeek > safe) lines.push(`<span class="warn">⚠️ Быстрее безопасного темпа (около 1% веса в неделю, то есть ${num(safe, 1)} кг). Рекомендуемый срок: от ${Math.ceil((g.from - g.to) / safe * 7)} дней.</span>`);
@@ -1495,7 +1611,10 @@
   function profileInfo() {
     const p = state.profile, out = [];
     const h = nval(p.height), w = nval(p.weight), age = nval(p.age);
-    if (h > 0 && w > 0) {
+    if (isSchool()) {
+      // у школьника вес и ИМТ не считаем: детские нормы зависят от возраста, это вопрос к врачу, а не к трекеру
+      if (nval(p.grade) > 0) out.push(`🎒 ${fmtNum(nval(p.grade))} класс. Учёба — главная работа, но спорт, сон и семья важны не меньше.`);
+    } else if (h > 0 && w > 0) {
       const bmi = w / (h / 100) ** 2;
       const cat = bmi < 18.5 ? 'недостаток веса' : bmi < 25 ? 'норма' : bmi < 30 ? 'избыточный вес' : 'ожирение';
       out.push(`⚖️ ИМТ <b>${num(bmi, 1)}</b>: ${cat}. Здоровый вес при росте ${fmtNum(h)} см: ${Math.ceil(18.5 * (h / 100) ** 2)}–${Math.floor(25 * (h / 100) ** 2)} кг.`);
@@ -1505,7 +1624,7 @@
       const now = (wake + (wake <= bed ? 1440 : 0)) - bed, need = fmtMin(wake - sh * 60), diff = now - sh * 60;
       out.push(`😴 Сейчас вы спите <b>${hm(now)}</b>. Чтобы спать ${fmtNum(sh)} ч и вставать в ${fmtMin(wake)}, ложиться нужно в <b>${need}</b>${diff < 0 ? ` (на ${-diff} мин раньше)` : diff > 0 ? `, а у вас даже ${diff} мин запаса` : ''}.`);
     }
-    if (age > 0) out.push(`🛏️ Рекомендуемый сон для вашего возраста: ${age < 18 ? '8–10' : age < 65 ? '7–9' : '7–8'} ч.`);
+    if (age > 0) out.push(`🛏️ Рекомендуемый сон для вашего возраста: ${age < 13 ? '9–12' : age < 18 ? '8–10' : age < 65 ? '7–9' : '7–8'} ч.`);
     return out.join('<br>') || '<span class="muted">Заполните поля, и здесь появятся подсказки для целей.</span>';
   }
 
@@ -1548,7 +1667,7 @@
         <h2>Профиль</h2>
         <p class="lead">Исходные данные: из них считаются подсказки и стартовые значения целей.</p>
         <div class="prof">
-          ${pf('age', 'Возраст', '35')}${pf('height', 'Рост, см', '180')}${pf('weight', 'Вес, кг', '95')}
+          ${isSchool() ? pf('age', 'Возраст', '12') + pf('grade', 'Класс', '6') : pf('age', 'Возраст', '35') + pf('height', 'Рост, см', '180') + pf('weight', 'Вес, кг', '95')}
           ${pf('wake', 'Обычно встаю', '07:00')}${pf('bed', 'Обычно ложусь', '23:30')}${pf('sleepH', 'Хочу спать, ч', '8')}
         </div>
         <div class="preview">${profileInfo()}</div>
@@ -1557,7 +1676,7 @@
       <section class="card" id="newGoal">
         <h2>Новая цель</h2>
         <p class="lead">Выберите шаблон: поля заполнятся из профиля, всё можно поправить.</p>
-        <div class="tpls">${GOAL_TPLS.map(([id, ic, nm, ds]) => `<button class="tpl${goalDraft && goalDraft.tpl === id ? ' on' : ''}" data-act="goalTpl" data-t="${id}"><b>${ic} ${nm}</b><span>${ds}</span></button>`).join('')}</div>
+        <div class="tpls">${GOAL_TPLS[state.mode || 'adult'].map(([id, ic, nm, ds]) => `<button class="tpl${goalDraft && goalDraft.tpl === id ? ' on' : ''}" data-act="goalTpl" data-t="${id}"><b>${ic} ${nm}</b><span>${ds}</span></button>`).join('')}</div>
         ${goalForm()}
       </section>
 
@@ -1666,6 +1785,12 @@
         <input type="text" class="ask" value="${esc(h.ask || '')}" data-hf="ask" data-id="${h.id}" maxlength="100" placeholder="✎ Вопрос для заметки, например «Что узнал?». Пусто — без заметки">
       </div>`;
     return `<div class="grid g2">
+      <section class="card wide">
+        <h2>Режим</h2>
+        <p class="lead">От режима зависят сферы, стартовые привычки, срывы, задания дня и шаблоны целей.
+          При смене текущие привычки и срывы уходят в архив, а история и XP сохраняются.</p>
+        <div class="seg">${Object.entries(MODES).map(([m, x]) => `<button class="${state.mode === m ? 'on' : ''}" data-act="switchMode" data-m="${m}">${x.name}</button>`).join('')}</div>
+      </section>
       <section class="card">
         <h2>Минимум дня</h2>
         <p class="lead">Сколько XP нужно набрать, чтобы день засчитался как рост (+1%). Начните с малого: важна регулярность.</p>
@@ -1730,6 +1855,11 @@
     shown = { k: viewDate, s: calcFor(viewDate).status };
     const views = { today: viewToday, goals: viewGoals, progress: viewProgress, report: viewReport, spheres: viewSpheres, awards: viewAwards, settings: viewSettings };
     if (!views[view]) view = 'today';
+    if (!state.mode) { // первый запуск: выбор режима
+      main.innerHTML = viewWelcome();
+      document.querySelectorAll('#tabs button').forEach((b) => b.classList.remove('on'));
+      return;
+    }
     // запомнить поле ввода в фокусе, чтобы вернуть его после перерисовки
     const ae = document.activeElement;
     let fkey = null, sel = null;
@@ -1821,8 +1951,8 @@
       afterChange(viewDate);
     },
     delAction: (el) => { const d = dayMut(viewDate); d.a = (d.a || []).filter((a) => a.id !== el.dataset.id); afterChange(viewDate); },
-    archive: (el) => { habitById(el.dataset.id).archived = true; save(); render(); },
-    restore: (el) => { habitById(el.dataset.id).archived = false; save(); render(); },
+    archive: (el) => { freezeFocus(); habitById(el.dataset.id).archived = true; save(); render(); },
+    restore: (el) => { freezeFocus(); habitById(el.dataset.id).archived = false; save(); render(); },
     goalTpl: (el) => {
       goalDraft = goalTemplate(el.dataset.t); render();
       const f = document.getElementById('goalForm'); if (f) f.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1843,7 +1973,7 @@
     },
     goalHabit: (el) => {
       const g = goalById(el.dataset.id);
-      state.habits.push({ id: 'h' + uid(), name: g.habit, sphere: g.sphere, xp: 10, ask: '', archived: false });
+      freezeFocus(); state.habits.push({ id: 'h' + uid(), name: g.habit, sphere: g.sphere, xp: 10, ask: '', archived: false });
       save(); render(); toast(`📌 Привычка «${g.habit}» добавлена. Теперь результат нужно удержать.`);
     },
     sbArchive: (el) => { sbById(el.dataset.id).archived = true; save(); render(); },
@@ -1883,6 +2013,16 @@
       dayMut(viewDate).j = ta.value; ensureStart(viewDate);
       afterChange(viewDate, el);
     },
+    chooseMode: (el) => {
+      applyMode(el.dataset.m); state.start = todayKey(); view = 'today'; save(); render();
+      toast(el.dataset.m === 'school' ? '🎒 Готово! Отмечай, что сделал сегодня, и расти на 1% каждый день.' : '👤 Готово! Путь начинается сегодня.');
+    },
+    switchMode: (el) => {
+      const m = el.dataset.m;
+      if (m === state.mode) return;
+      if (!confirm(`Переключить режим на «${MODES[m].name.slice(3)}»?\n\nСферы переименуются, привычки и срывы заменятся набором этого режима. Текущие привычки и срывы (в том числе ваши собственные) уйдут в архив, их можно вернуть. История, XP и цели сохранятся.`)) return;
+      applyMode(m); save(); render(); toast(`Режим: ${MODES[m].name}`);
+    },
     reset: () => {
       if (!confirm('Удалить всю историю, достижения и настройки и начать путь заново?')) return;
       state = fresh(); viewDate = todayKey(); save(); render(); toast('Новый путь начинается сегодня 🌱');
@@ -1905,7 +2045,7 @@
     } else if (e.target.id === 'habitForm') {
       const name = document.getElementById('hName').value.trim();
       if (!name) return;
-      state.habits.push({ id: 'h' + uid(), name, sphere: document.getElementById('hSphere').value, xp: Number(document.getElementById('hXP').value), ask: document.getElementById('hAsk').value.trim(), archived: false });
+      freezeFocus(); state.habits.push({ id: 'h' + uid(), name, sphere: document.getElementById('hSphere').value, xp: Number(document.getElementById('hXP').value), ask: document.getElementById('hAsk').value.trim(), archived: false });
       save(); render(); toast('Привычка добавлена');
     } else if (e.target.id === 'goalForm') {
       const r = draftParsed();
@@ -1969,6 +2109,7 @@
     if (t.dataset.field === 'journal' || t.dataset.field === 'note' || t.dataset.field === 'sbnote') { const k = viewDate; setTimeout(() => afterChange(k), 200); return; }
     if (t.id === 'noteHabit') { rep.habit = t.value; render(); return; }
     if (t.dataset.hf) {
+      freezeFocus();
       const h = habitById(t.dataset.id);
       if (t.dataset.hf === 'name') { if (t.value.trim()) h.name = t.value.trim(); }
       else h[t.dataset.hf] = t.dataset.hf === 'xp' ? Number(t.value) : t.dataset.hf === 'ask' ? t.value.trim() : t.value;
@@ -1996,7 +2137,7 @@
         if (!data || typeof data.days !== 'object' || !Array.isArray(data.habits) || !Array.isArray(data.spheres)) throw new Error('bad');
         if (!confirm('Заменить текущие данные содержимым файла?')) return;
         state = { ...fresh(), ...data, settings: { ...fresh().settings, ...data.settings } };
-        migrate();
+        migrate(); freezeFocus();
         save(); render(); toast('Данные загружены');
       }).catch(() => toast('Не удалось прочитать файл: это не копия «+1%»'));
     }
@@ -2022,6 +2163,7 @@
   // просим браузер не очищать данные при нехватке места
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
 
+  freezeFocus();
   applyTheme();
   render();
   checkAch(true);
