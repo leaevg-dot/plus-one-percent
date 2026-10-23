@@ -26,6 +26,7 @@
     --good: #0ca30c;
     --good-ink: #006300;
     --bad: #d03b3b;
+    --serious: #ec835a; /* статус «регулярно», одинаковый в обеих темах */
     --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100;
     --c5: #e87ba4; --c6: #008300; --c7: #6250d6; --c8: #e34948;
     --h1: #b7d3f6; --h2: #6da7ec; --h3: #2a78d6; --h4: #104281;
@@ -279,6 +280,16 @@
   .notes-list li { padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
   .notes-list li:last-child { border-bottom: 0; }
   .notes-list .d { font-size: 12px; color: var(--ink-3); }
+  .alerts { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); margin-top: 8px; }
+  .alert { border: 1px solid var(--line); border-left: 4px solid var(--serious); border-radius: 12px; padding: 12px 14px; }
+  .alert.sev-hi { border-left-color: var(--bad); background: color-mix(in srgb, var(--bad) 6%, var(--surface)); }
+  .alert .al-top { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; font-size: 14px; }
+  .alert .sev { font-size: 12px; font-weight: 700; color: var(--ink-2); }
+  .alert .al-big { font-size: 22px; font-weight: 700; margin: 4px 0; font-variant-numeric: tabular-nums; }
+  .alert .al-meta { font-size: 13px; color: var(--ink-2); line-height: 1.5; }
+  .up-bad { color: var(--bad); font-weight: 600; }
+  .down-good { color: var(--good-ink); font-weight: 600; }
+  .pen-txt { color: var(--bad); font-size: 13px; font-weight: 600; }
   .notes-list mark { background: color-mix(in srgb, var(--c4) 35%, transparent); color: inherit; border-radius: 3px; }
   .seg { display: inline-flex; gap: 2px; background: var(--soft); border-radius: 10px; padding: 3px; flex-wrap: wrap; }
   .seg button { border: 0; background: none; padding: 5px 10px; border-radius: 8px; cursor: pointer; color: var(--ink-2); font-size: 13px; }
@@ -1216,7 +1227,7 @@
   const STATUS_TXT = { grow: '✅ рост', hold: '➖ удержание', miss: '🔻 спад', rest: '🛌 восстановление' };
   const statusText = (k, s) => (k === todayKey() && s !== 'grow' && s !== 'rest' ? '⏳ в процессе' : STATUS_TXT[s]);
   const PERIODS = [[7, '7 дней'], [30, '30 дней'], [90, '90 дней'], [365, 'Год'], [0, 'Всё время']];
-  let rep = { period: 30, tag: null, open: {}, habit: null, q: '' };
+  let rep = { period: 30, tag: null, open: {}, habit: null, q: '', sb: null };
 
   // заметки к привычкам за период: [{k, h, text}], новые сверху
   function periodNotes(ks) {
@@ -1264,7 +1275,7 @@
     const a = all(), t = todayKey(), ks = periodKeys();
     const idxOf = Object.fromEntries(a.tl.map((x) => [x.k, x.idx]));
     let xp = 0, grow = 0, miss = 0, acts = 0, sbN = 0, sbLost = 0, cleanDays = 0;
-    const bySphere = {}, sphereActs = {}, habitDays = {}, tags = {}, sbStat = {}, sbNotes = [];
+    const bySphere = {}, sphereActs = {}, habitDays = {}, tags = {}, sbStat = {};
     ks.forEach((k) => {
       const c = a.days[k], d = day(k);
       xp += c.xp; acts += c.count; sbLost += c.pen;
@@ -1275,7 +1286,7 @@
         const m = (sbStat[sb.id] = sbStat[sb.id] || { n: 0, fix: 0, noted: 0, lost: 0 });
         m.n++; m.lost += penOf(sb, r);
         if (r.fix) m.fix++;
-        if ((r.note || '').trim()) { m.noted++; sbNotes.push({ k, sb, r }); }
+        if ((r.note || '').trim()) m.noted++;
       });
       if (c.status === 'grow') grow++; else if (c.status === 'miss' && k !== t) miss++;
       for (const s in c.by) bySphere[s] = (bySphere[s] || 0) + c.by[s];
@@ -1306,16 +1317,7 @@
         <td class="n">${posTotal ? num((Math.max(0, v) / posTotal) * 100) : 0}%</td><td style="width:30%"><div class="mini"><i style="width:${Math.max(0, v / maxS) * 100}%;background:${color(s.id)}"></i></div></td></tr>`;
     }).join('');
 
-    const sbRows = state.setbacks.filter((s) => sbStat[s.id] || !s.archived)
-      .sort((x, y) => ((sbStat[y.id] || {}).n || 0) - ((sbStat[x.id] || {}).n || 0))
-      .map((s) => {
-        const m = sbStat[s.id] || { n: 0, fix: 0, noted: 0, lost: 0 }, w = sbDaysWithout(s);
-        return `<tr><td>${sphere(s.sphere).icon} ${esc(s.name)}${s.archived ? ' <span class="muted">(архив)</span>' : ''}</td>
-          <td class="n">${m.n || '<span class="muted">0</span>'}</td><td class="n">${m.fix}</td><td class="n">${m.noted}</td>
-          <td class="n"${m.lost ? ' style="color:var(--bad)"' : ''}>${m.lost ? '−' + m.lost : 0}</td>
-          <td class="n">${w ? w + ' дн.' : 'сегодня'}</td></tr>`;
-      }).join('');
-    const sbNoteList = sbNotes.map(({ k, sb, r }) => `<li><div class="d">${fmtDay(k)} · ${sphere(sb.sphere).icon} ${esc(sb.name)} · ${r.fix ? '✓ исправлено' : 'штраф ×½'}</div>${hl(r.note)}</li>`).join('');
+    const sbBlock = setbackReport(ks, sbStat, cleanDays);
 
     const habits = state.habits.filter((h) => !h.archived || habitDays[h.id])
       .sort((x, y) => (habitDays[y.id] || 0) - (habitDays[x.id] || 0));
@@ -1399,13 +1401,7 @@
         <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Привычка</th><th class="n">Дней</th><th class="n">%</th><th class="n">Заметок</th><th></th></tr></thead><tbody>${habitRows}</tbody></table></div>
       </section>
 
-      <section class="card wide">
-        <h2>🔻 Срывы и откаты</h2>
-        <p class="lead">Чистых дней в периоде: <b>${cleanDays}</b> из ${ks.length}. Сейчас без срывов ${a.clean} дн. подряд, рекорд ${a.bestClean}.
-          В колонке «Дней без» — сколько дней прошло с последнего раза.</p>
-        <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Срыв</th><th class="n">Раз</th><th class="n">Исправлено</th><th class="n">С разбором</th><th class="n">Потеряно XP</th><th class="n">Дней без</th></tr></thead><tbody>${sbRows}</tbody></table></div>
-        ${sbNoteList ? `<h2 style="margin-top:16px">Разборы: что случилось и выводы</h2><ul class="notes-list">${sbNoteList}</ul>` : ''}
-      </section>
+      ${sbBlock}
 
       ${state.goals.length ? `<section class="card wide">
         <h2>🎯 Цели</h2>
@@ -1442,6 +1438,110 @@
           <tbody>${rows || '<tr><td colspan="6" class="muted">Нет дней для показа.</td></tr>'}</tbody></table></div>
       </section>
     </div>`;
+  }
+
+  // ---------- срывы в отчёте ----------
+  const WD = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'];
+  const weekday = (k) => (dateOf(k).getDay() + 6) % 7;
+  // «20 раз», «3 раза», «1 раз»
+  const times = (n) => { const a = n % 10, b = n % 100; return `${n} ${a === 1 && b !== 11 ? 'раз' : a >= 2 && a <= 4 && (b < 12 || b > 14) ? 'раза' : 'раз'}`; };
+
+  // все случаи срывов за список дней: [{ k, sb, r, pen }]
+  function sbEvents(keys) {
+    const out = [];
+    keys.forEach((k) => sbList(day(k)).forEach(({ sb, r }) => out.push({ k, sb, r, pen: penOf(sb, r) })));
+    return out;
+  }
+
+  function setbackReport(ks, sbStat, cleanDays) {
+    const a = all(), len = ks.length, oldest = ks[len - 1];
+    const events = sbEvents(ks); // новые сверху, как ks
+    // прошлый период той же длины (только дни после старта пути)
+    const prevKeys = [];
+    if (rep.period) for (let i = 1; i <= len; i++) { const k = addDays(oldest, -i); if (k >= state.start) prevKeys.push(k); }
+    const prevN = {};
+    sbEvents(prevKeys).forEach((e) => { prevN[e.sb.id] = (prevN[e.sb.id] || 0) + 1; });
+    const hasPrev = prevKeys.length === len;
+
+    // по каждому срыву: дни недели и сколько штрафа снято разбором и исправлением
+    const extra = {};
+    events.forEach((e) => {
+      const m = (extra[e.sb.id] = extra[e.sb.id] || { wd: [0, 0, 0, 0, 0, 0, 0], full: 0 });
+      m.wd[weekday(e.k)]++; m.full += e.sb.pen;
+    });
+    // дни недели, где срыв случается заметно чаще среднего (в 1,5 раза и хотя бы дважды)
+    const topDays = (id, n) => {
+      if (n < 3) return '';
+      const wd = extra[id].wd, lim = Math.max(2, 1.5 * n / 7);
+      return WD.map((nm, i) => [nm, wd[i]]).filter(([, c]) => c >= lim).map(([nm, c]) => `${nm} (${c})`).join(', ');
+    };
+    const trend = (id, n) => {
+      if (!hasPrev) return '<span class="muted">—</span>';
+      const d = n - (prevN[id] || 0);
+      return d > 0 ? `<span class="up-bad">+${d} ↑</span>` : d < 0 ? `<span class="down-good">−${-d} ↓</span>` : '<span class="muted">0</span>';
+    };
+    const perWeek = (n) => num(n / len * 7, n / len * 7 < 10 ? 1 : 0);
+
+    // частые срывы: от 3 раз и не реже чем в каждый пятый день
+    const flagged = state.setbacks.filter((s) => sbStat[s.id] && sbStat[s.id].n >= 3 && sbStat[s.id].n / len >= 0.2)
+      .sort((x, y) => sbStat[y.id].n - sbStat[x.id].n);
+    const alerts = flagged.map((s) => {
+      const m = sbStat[s.id], f = m.n / len, hi = f >= 0.5;
+      const td = topDays(s.id, m.n), saved = extra[s.id].full - m.lost;
+      const every = f >= 0.95 ? 'каждый день' : `в ${num(f * 100)}% дней, примерно ${perWeek(m.n)} в неделю`;
+      return `<div class="alert ${hi ? 'sev-hi' : 'sev-mid'}">
+        <div class="al-top"><span class="sev">${hi ? '🔴 Часто' : '🟠 Регулярно'}</span><b>${sphere(s.sphere).icon} ${esc(s.name)}</b></div>
+        <div class="al-big">${times(m.n)} за ${len} дн.</div>
+        <div class="al-meta">${every} · штрафы <b>−${m.lost} XP</b>${saved > 0 ? ` (ещё ${saved} XP снято разборами и исправлениями)` : ''}
+          ${td ? `<br>Чаще всего: <b>${td}</b>` : ''}${hasPrev ? `<br>К прошлому периоду: ${trend(s.id, m.n)}` : ''}</div>
+      </div>`;
+    }).join('');
+
+    if (rep.sb && !sbStat[rep.sb]) rep.sb = null;
+    const rows = state.setbacks.filter((s) => sbStat[s.id] || !s.archived)
+      .sort((x, y) => ((sbStat[y.id] || {}).n || 0) - ((sbStat[x.id] || {}).n || 0) || x.name.localeCompare(y.name))
+      .map((s) => {
+        const m = sbStat[s.id] || { n: 0, fix: 0, noted: 0, lost: 0 }, w = sbDaysWithout(s);
+        const maxN = Math.max(1, ...Object.values(sbStat).map((x) => x.n));
+        if (!m.n) return `<tr><td>${sphere(s.sphere).icon} ${esc(s.name)}</td><td class="n muted">0</td><td colspan="5" class="muted">ни разу за период ✓</td>
+          <td class="n">${w ? w + ' дн.' : 'сегодня'}</td></tr>`;
+        return `<tr class="click${rep.sb === s.id ? ' open' : ''}" data-act="repSb" data-id="${s.id}" title="Показать в журнале штрафов">
+          <td>${sphere(s.sphere).icon} ${esc(s.name)}${s.archived ? ' <span class="muted">(архив)</span>' : ''}</td>
+          <td class="n"><b>${m.n}</b></td>
+          <td style="min-width:110px"><div class="row" style="gap:6px;align-items:center;flex-wrap:nowrap"><div class="mini" style="flex:1"><i style="width:${m.n / maxN * 100}%;background:var(--bad)"></i></div><span class="muted nowrap">${perWeek(m.n)}/нед</span></div></td>
+          <td class="n" style="color:var(--bad)">${m.lost ? '−' + m.lost : 0}</td>
+          <td class="n">${m.fix}</td><td class="n">${m.noted}</td>
+          <td class="n">${trend(s.id, m.n)}</td>
+          <td class="n">${w ? w + ' дн.' : 'сегодня'}</td></tr>`;
+      }).join('');
+
+    const shown = rep.sb ? events.filter((e) => e.sb.id === rep.sb) : events;
+    const total = shown.reduce((s, e) => s + e.pen, 0), full = shown.reduce((s, e) => s + e.sb.pen, 0);
+    const why = (e) => e.r.fix ? `0 XP: исправлено — ${esc(e.sb.fix)}` : (e.r.note || '').trim() ? `−${e.pen} XP: разбор, штраф ×½ (полный −${e.sb.pen})` : `−${e.pen} XP: полный штраф`;
+    const log = shown.map((e) => `<li><div class="d">${fmtDay(e.k)} · ${sphere(e.sb.sphere).icon} ${esc(e.sb.name)}</div>
+      <span class="${e.pen ? 'pen-txt' : 'down-good'}">${why(e)}</span>${(e.r.note || '').trim() ? `<br>✎ ${hl(e.r.note)}` : ''}</li>`).join('');
+
+    return `<section class="card wide" id="sbReport">
+      <h2>🔻 Срывы и откаты</h2>
+      <p class="lead">Чистых дней в периоде: <b>${cleanDays}</b> из ${len}. Сейчас без срывов ${a.clean} дн. подряд, рекорд ${a.bestClean}.
+        Здесь видно то, что в жизни легко не замечать: какие срывы повторяются, как часто и во что обходятся.</p>
+
+      <h2 style="margin-top:4px">⚠️ На что обратить внимание</h2>
+      ${alerts ? `<div class="alerts">${alerts}</div>
+        <p class="lead" style="margin-top:8px">Если срыв повторяется, полезно разобраться, что его запускает: время, место, люди, усталость.
+          Разборы в журнале ниже помогают увидеть закономерность.</p>`
+        : `<p class="muted">Частых срывов за этот период нет ✓ (частым считается от 3 раз и не реже, чем в каждый пятый день).</p>`}
+
+      <h2 style="margin-top:14px">Все срывы за период</h2>
+      <p class="lead">Щёлкните по строке, чтобы увидеть каждый случай в журнале штрафов.${hasPrev ? ' «К прошлому» — сравнение с предыдущим периодом такой же длины.' : ''}</p>
+      <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Срыв</th><th class="n">Раз</th><th>Частота</th><th class="n">Штраф, XP</th>
+        <th class="n">Исправлено</th><th class="n">С разбором</th><th class="n">К прошлому</th><th class="n">Дней без</th></tr></thead><tbody>${rows}</tbody></table></div>
+
+      <h2 style="margin-top:14px">Журнал штрафов</h2>
+      ${rep.sb ? `<div class="filter-note">Показан срыв: <b>${esc(sbById(rep.sb).name)}</b><button class="btn small" data-act="repSb" data-id="${rep.sb}">✕ Показать все</button></div>` : ''}
+      ${shown.length ? `<p class="lead">Итого: ${times(shown.length)}, начислено <b style="color:var(--bad)">−${total} XP</b>${full > total ? `, разборы и исправления сняли ${full - total} XP` : ''}.</p>
+        <ul class="notes-list">${log}</ul>` : '<p class="muted">За этот период срывов нет.</p>'}
+    </section>`;
   }
 
   function exportCSV() {
@@ -2000,6 +2100,10 @@
     },
     import: () => document.getElementById('importFile').click(),
     repPeriod: (el) => { rep.period = Number(el.dataset.p); render(); },
+    repSb: (el) => {
+      rep.sb = rep.sb === el.dataset.id ? null : el.dataset.id; render();
+      const box = document.getElementById('sbReport'); if (box) box.scrollIntoView({ block: 'start' });
+    },
     repTag: (el) => { rep.tag = rep.tag === el.dataset.tag ? null : el.dataset.tag; render(); },
     repNotes: (el) => { rep.habit = el.dataset.id; rep.q = ''; render(); document.getElementById('notesCard').scrollIntoView({ behavior: 'smooth' }); },
     repRow: (el) => { rep.open[el.dataset.k] = !rep.open[el.dataset.k]; render(); },
