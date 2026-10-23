@@ -280,6 +280,29 @@
   .notes-list li { padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
   .notes-list li:last-child { border-bottom: 0; }
   .notes-list .d { font-size: 12px; color: var(--ink-3); }
+  .stat-btn { text-align: left; border: 1px solid transparent; cursor: pointer; font: inherit; color: inherit; position: relative; transition: border-color .15s, background .15s; }
+  .stat-btn:hover { border-color: var(--ink-3); }
+  .stat-btn.on { border-color: var(--ink); background: var(--surface); }
+  .stat-btn i { display: block; font-style: normal; font-size: 11px; color: var(--ink-3); margin-top: 2px; }
+  .stat-panel { margin-top: 14px; padding: 14px; border-radius: 14px; border: 1px solid var(--line); background: var(--bg); }
+  .stat-panel h2 { margin: 0 0 6px; }
+  .stat-panel h3 { font-size: 13px; margin: 14px 0 4px; }
+  details.bd { border-bottom: 1px solid var(--line); }
+  details.bd summary { display: flex; gap: 10px; align-items: baseline; padding: 9px 2px; cursor: pointer; list-style: none; }
+  details.bd summary::-webkit-details-marker { display: none; }
+  details.bd summary::before { content: '▸'; color: var(--ink-3); width: 10px; flex: none; }
+  details.bd[open] summary::before { content: '▾'; }
+  details.bd ul { list-style: none; margin: 0 0 10px; padding: 0 0 0 20px; }
+  details.bd li { display: flex; gap: 10px; align-items: baseline; padding: 4px 0; font-size: 13px; border-top: 1px dashed var(--line); }
+  details.bd .bd-t { flex: 1; min-width: 0; }
+  details.bd .btn { margin: 0 0 10px 20px; }
+  .pos { color: var(--good-ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .neg { color: var(--bad); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .bd-total { margin-top: 10px; font-size: 14px; }
+  .idx-lines { list-style: none; padding: 0; margin: 4px 0; font-size: 14px; line-height: 1.8; }
+  .day-list { list-style: none; padding: 0; margin: 0; font-size: 13px; }
+  .day-list li { padding: 3px 0; }
+  .linkish { border: 0; background: none; padding: 0; color: var(--c1); cursor: pointer; font: inherit; text-decoration: underline; text-underline-offset: 2px; }
   .alerts { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); margin-top: 8px; }
   .alert { border: 1px solid var(--line); border-left: 4px solid var(--serious); border-radius: 12px; padding: 12px 14px; }
   .alert.sev-hi { border-left-color: var(--bad); background: color-mix(in srgb, var(--bad) 6%, var(--surface)); }
@@ -605,8 +628,8 @@
       if (k < g.start) return;
       const v = (g.log || {})[k];
       const did = g.type === 'measure' ? isFinite(Number(v)) && v !== undefined && v !== '' : g.type === 'sum' ? v > 0 : !!v;
-      if (did) out.push({ sphere: g.sphere, xp: g.type === 'measure' ? GOAL_LOG_XP : GOAL_STEP_XP, step: true });
-      if (goalInfo(g).doneAt === k) out.push({ sphere: g.sphere, xp: GOAL_DONE_XP, step: false });
+      if (did) out.push({ sphere: g.sphere, xp: g.type === 'measure' ? GOAL_LOG_XP : GOAL_STEP_XP, step: true, g, kind: g.type === 'measure' ? 'log' : 'step' });
+      if (goalInfo(g).doneAt === k) out.push({ sphere: g.sphere, xp: GOAL_DONE_XP, step: false, g, kind: 'done' });
     });
     return out;
   }
@@ -1331,7 +1354,7 @@
         <td style="width:30%"><div class="mini"><i style="width:${p}%;background:${color(h.sphere)}"></i></div></td></tr>`;
     }).join('');
 
-    const rows = (rep.tag ? ks.filter((k) => dayTags(k).includes(rep.tag)) : ks).map((k) => {
+    const rows = ks.filter((k) => (!rep.tag || dayTags(k).includes(rep.tag)) && (!rep.status || effStatus(k) === rep.status)).map((k) => {
       const c = a.days[k], d = day(k), open = rep.open[k];
       const prev = idxOf[addDays(k, -1)] || 1;
       const delta = idxOf[k] / prev - 1;
@@ -1339,7 +1362,7 @@
       const dots = Object.keys(c.by).map((s) => `<span class="sw" style="background:${color(s)}" data-tip="${esc(sphere(s).icon + ' ' + sphere(s).name + ': ' + c.by[s] + ' XP')}"></span>`).join(' ');
       let html = `<tr class="click${open ? ' open' : ''}" data-act="repRow" data-k="${k}">
         <td class="nowrap">${open ? '▾' : '▸'} ${fmtDay(k, { weekday: 'short', day: 'numeric', month: 'short' })}</td>
-        <td class="nowrap">${statusText(k, c.status)}</td>
+        <td class="nowrap">${statusText(k, c.status)}${effStatus(k) === 'miss' ? ` <span class="muted">(${c.pen ? 'срывы' : 'пусто'})</span>` : ''}</td>
         <td class="n">${c.xp}</td>
         <td class="n">×${num(idxOf[k] || 1, 3)} <span class="muted">${dTxt}</span></td>
         <td class="nowrap">${c.count} ${dots}${c.sb ? ` <span style="color:var(--bad)" data-tip="${esc(`Срывов: ${c.sb}, штраф −${c.pen} XP`)}">🔻${c.sb}</span>` : ''}</td>
@@ -1355,8 +1378,12 @@
         const ss = sbList(d).map(({ sb, r }) => `🔻 ${sphere(sb.sphere).icon} ${esc(sb.name)} <span style="color:var(--bad)">${penOf(sb, r) ? '−' + penOf(sb, r) : '0'}</span>
           <span class="muted">${r.fix ? '(исправлено: ' + esc(sb.fix) + ')' : (r.note || '').trim() ? '(с разбором)' : ''}</span>${(r.note || '').trim() ? `<br><span style="color:var(--ink)">✎ ${hl(r.note)}</span>` : ''}`);
         const gs = goalDayLines(k).map((x) => esc(x));
+        const dayGroups = xpBreakdown([k]);
+        const dPlus = dayGroups.reduce((p, x) => p + Math.max(0, x.xp), 0), dMinus = dayGroups.reduce((p, x) => p + Math.min(0, x.xp), 0);
         const body = list('Цели', gs) + list('Привычки', hs) + list('Задания дня', qs) + list('Другие дела', as) + list('Срывы', ss)
-          + (c.focus ? `<div class="muted">Сфера-фокус дня: ${sphere(c.focus).icon} ${esc(sphere(c.focus).name)} (×2)</div>` : '');
+          + ((d.j || '').trim() ? list('Дневник', [`запись «в чём стал лучше» +${JOURNAL_XP}`]) : '')
+          + (c.focus ? `<div class="muted">Сфера-фокус дня: ${sphere(c.focus).icon} ${esc(sphere(c.focus).name)} (×2)</div>` : '')
+          + (dayGroups.length ? `<div style="margin-top:6px">Итого за день: поощрения <b class="pos">+${dPlus}</b> · штрафы <b class="neg">${dMinus ? '−' + -dMinus : 0}</b> · <b>${signed(c.xp)} XP</b></div>` : '');
         html += `<tr class="detail"><td colspan="6">${body || 'В этот день ничего не отмечено.'}
           <div style="margin-top:6px"><button class="btn small" data-act="goDay" data-k="${k}">Открыть день и изменить</button></div></td></tr>`;
       }
@@ -1370,15 +1397,15 @@
           <button class="btn small" data-act="csv">⬇ Таблица для Excel (CSV)</button>
         </div>
         <div class="stats">
-          <div class="stat"><b>${ks.length}</b><span>дней в отчёте</span></div>
-          <div class="stat"><b>${grow}</b><span>дней роста</span></div>
-          <div class="stat"><b>${miss}</b><span>дней спада</span></div>
-          <div class="stat"><b>${num(xp)}</b><span>XP за период</span></div>
-          <div class="stat"><b>${acts}</b><span>полезных действий</span></div>
-          <div class="stat"><b>${dIdx >= 0 ? '+' : ''}${num(dIdx, 1)}%</b><span>изменение индекса</span></div>
-          <div class="stat"><b>${sbN}</b><span>срывы, раз</span></div>
-          <div class="stat"><b>${sbLost ? '−' + sbLost : 0}</b><span>XP потеряно на срывах</span></div>
+          ${[
+            ['days', ks.length, 'дней в отчёте'], ['grow', grow, 'дней роста'], ['miss', miss, 'дней спада'],
+            ['xp', signed(xp), 'XP за период'], ['acts', acts, 'полезных действий'],
+            ['idx', `${dIdx >= 0 ? '+' : ''}${num(dIdx, 1)}%`, 'изменение индекса'],
+            ['sb', sbN, 'срывы, раз'], ['sbxp', sbLost ? '−' + sbLost : 0, 'XP потеряно на срывах'],
+          ].map(([id, v, l]) => `<button class="stat stat-btn${rep.stat === id || (rep.status && STAT_STATUS[id] === rep.status) ? ' on' : ''}" data-act="repStat" data-s="${id}">
+            <b>${v}</b><span>${l}</span><i>подробнее ›</i></button>`).join('')}
         </div>
+        ${statPanel(ks, { xp, acts, grow, miss, dIdx })}
       </section>
 
       <section class="card">
@@ -1430,14 +1457,114 @@
         <ul class="notes-list" id="notesList"></ul>
       </section>
 
-      <section class="card wide">
+      <section class="card wide" id="daysCard">
         <h2>По дням</h2>
-        <p class="lead">Щёлкните по строке, чтобы увидеть, что именно было сделано.</p>
+        <p class="lead">Щёлкните по строке, чтобы увидеть, за что в этот день начислены XP и штрафы.</p>
+        ${rep.status ? `<div class="filter-note">Показаны дни: <b>${STATUS_NAMES[rep.status]}</b><button class="btn small" data-act="repStatus" data-st="">✕ Все дни</button></div>` : ''}
         ${rep.tag ? `<div class="filter-note">Показаны дни с тегом <span class="tag">${esc(rep.tag)}</span><button class="btn small" data-act="repTag" data-tag="${esc(rep.tag)}">✕ Снять фильтр</button></div>` : ''}
         <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Дата</th><th>Статус</th><th class="n">XP</th><th class="n">Индекс</th><th>Действий</th><th>В чём стал лучше</th></tr></thead>
           <tbody>${rows || '<tr><td colspan="6" class="muted">Нет дней для показа.</td></tr>'}</tbody></table></div>
       </section>
     </div>`;
+  }
+
+  // ---------- плитки сводки отчёта ----------
+  // статус дня для фильтра: сегодняшний незавершённый день — «в процессе»
+  const effStatus = (k) => { const s = calcFor(k).status; return k === todayKey() && s !== 'grow' && s !== 'rest' ? 'pending' : s; };
+  const STATUS_NAMES = { grow: '✅ рост', hold: '➖ удержание', miss: '🔻 спад', rest: '🛌 восстановление', pending: '⏳ сегодня, в процессе' };
+  const STAT_STATUS = { grow: 'grow', miss: 'miss' }; // плитки, которые фильтруют таблицу дней
+  const sgn = (x) => (x > 0 ? '+' : x < 0 ? '−' : '') + num(Math.abs(x));
+
+  // откуда взялись XP за список дней: группы источников и в каждой — что именно, сколько раз, сколько XP
+  function xpBreakdown(ks) {
+    const G = (key, icon, title, action) => ({ key, icon, title, action, xp: 0, n: 0, items: {} });
+    const g = {
+      habits: G('habits', '✅', 'Привычки', true), focus: G('focus', '🎯', 'Бонус сферы-фокуса ×2', false),
+      notes: G('notes', '✎', 'Заметки к привычкам', false), quests: G('quests', '🎲', 'Задания дня', true),
+      acts: G('acts', '➕', 'Другие полезные дела', true), journal: G('journal', '📓', 'Дневник «в чём стал лучше»', false),
+      goals: G('goals', '🏁', 'Цели', true), sb: G('sb', '🔻', 'Срывы (штрафы)', false),
+    };
+    // an — сколько из этого считается «полезным действием» (бонус за достижение цели — награда, а не действие)
+    const add = (grp, id, label, xp, extra, isAction = true) => {
+      const it = (grp.items[id] = grp.items[id] || { label, n: 0, an: 0, xp: 0, dates: [] });
+      it.n++; it.xp += xp; grp.n++; grp.xp += xp; if (extra) it.dates.push(extra);
+      if (isAction) { it.an++; grp.an = (grp.an || 0) + 1; }
+    };
+    ks.forEach((k) => {
+      const d = day(k), c = calcFor(k);
+      (d.h || []).forEach((id) => {
+        const h = habitById(id); if (!h) return;
+        const lbl = `${sphere(h.sphere).icon} ${h.name}`;
+        add(g.habits, id, lbl, h.xp);
+        if (h.sphere === c.focus) add(g.focus, id, lbl, h.xp);
+        if (noteOf(d, id)) add(g.notes, id, lbl, NOTE_XP);
+      });
+      (d.q || []).forEach((id) => { const q = QUEST_BY_ID[id]; if (q) add(g.quests, id, `${sphere(q.sphere).icon} ${q.text}`, q.xp); });
+      (d.a || []).forEach((x) => add(g.acts, x.id, `${sphere(x.sphere).icon} ${x.text}`, x.xp, fmtShort(k)));
+      if ((d.j || '').trim()) add(g.journal, 'j', 'Записи в дневнике', JOURNAL_XP);
+      goalXP(k).forEach((x) => add(g.goals, x.g.id + x.kind,
+        `${sphere(x.g.sphere).icon} ${x.g.title}: ${x.kind === 'done' ? 'цель достигнута 🏅' : x.kind === 'log' ? 'замеры' : 'шаги'}`, x.xp, '', x.step));
+      sbList(d).forEach(({ sb, r }) => add(g.sb, sb.id, `${sphere(sb.sphere).icon} ${sb.name}`, -penOf(sb, r), fmtShort(k)));
+    });
+    return Object.values(g).filter((x) => x.n);
+  }
+
+  function statPanel(ks, s) {
+    const a = all(), t = todayKey();
+    const close = '<button class="btn small" data-act="repStat" data-s="">✕ Свернуть</button>';
+    if (rep.stat === 'xp' || rep.stat === 'acts') {
+      const onlyActs = rep.stat === 'acts';
+      const groups = xpBreakdown(ks).filter((x) => !onlyActs || x.action);
+      const plus = groups.reduce((p, x) => p + Math.max(0, x.xp), 0), minus = groups.reduce((p, x) => p + Math.min(0, x.xp), 0);
+      const cnt = (o) => (onlyActs ? o.an || 0 : o.n);
+      const body = groups.map((x) => {
+        const items = Object.values(x.items).filter((it) => cnt(it)).sort((p, q) => Math.abs(q.xp) - Math.abs(p.xp) || q.n - p.n);
+        return `<details class="bd"${groups.length <= 2 ? ' open' : ''}>
+          <summary><span class="bd-t">${x.icon} ${x.title}</span><span class="muted">${times(cnt(x))}</span><b class="${x.xp < 0 ? 'neg' : 'pos'}">${sgn(x.xp)} XP</b></summary>
+          <ul>${items.map((it) => `<li><span class="bd-t">${esc(it.label)}${it.dates.length && it.dates.length <= 6 ? ` <span class="muted">(${it.dates.join(', ')})</span>` : ''}</span>
+            <span class="muted">${times(cnt(it))}</span><b class="${it.xp < 0 ? 'neg' : 'pos'}">${sgn(it.xp)}</b></li>`).join('')}</ul>
+          ${x.key === 'sb' ? '<button class="btn small" data-act="repGo" data-to="sbReport">Журнал штрафов →</button>' : ''}
+        </details>`;
+      }).join('');
+      return `<div class="stat-panel">
+        <div class="row" style="justify-content:space-between;align-items:baseline"><h2>${onlyActs ? `Полезные действия за период: ${s.acts}` : 'За что начислены XP и штрафы'}</h2>${close}</div>
+        <p class="lead">Нажмите на строку, чтобы раскрыть список.${onlyActs ? ' Действия — это отмеченные привычки, задания дня, другие дела и шаги целей.' : ''}</p>
+        ${body || '<p class="muted">За этот период ничего не отмечено.</p>'}
+        ${onlyActs ? '' : `<div class="bd-total">Поощрения <b class="pos">+${num(plus)}</b> · штрафы <b class="neg">${minus ? '−' + num(-minus) : 0}</b> · итого <b>${signed(s.xp)} XP</b></div>`}
+      </div>`;
+    }
+    if (rep.stat === 'idx') {
+      const by = { grow: [], hold: [], miss: [], rest: [] };
+      ks.forEach((k) => { const st = effStatus(k); if (by[st]) by[st].push(k); });
+      const f = Math.pow(1.01, by.grow.length) * Math.pow(0.99, by.miss.length);
+      const dayBtn = (k, txt) => `<li><button class="linkish" data-act="repDay" data-k="${k}">${fmtDay(k, { weekday: 'short', day: 'numeric', month: 'short' })}</button> <span class="muted">${txt}</span></li>`;
+      const minXP = state.settings.minXP;
+      return `<div class="stat-panel">
+        <div class="row" style="justify-content:space-between;align-items:baseline"><h2>Как изменился индекс</h2>${close}</div>
+        <ul class="idx-lines">
+          <li>✅ Дней роста: <b>${by.grow.length}</b> — каждый ×1,01</li>
+          <li>🔻 Дней спада: <b>${by.miss.length}</b> — каждый ×0,99</li>
+          <li>➖ Удержание: <b>${by.hold.length}</b> — индекс не менялся, минимум ${minXP} XP не набран</li>
+          ${by.rest.length ? `<li>🛌 Восстановление: <b>${by.rest.length}</b> — индекс не менялся</li>` : ''}
+        </ul>
+        <div class="bd-total">1,01<sup>${by.grow.length}</sup> × 0,99<sup>${by.miss.length}</sup> = <b>×${num(f, 3)}</b>, то есть <b>${s.dIdx >= 0 ? '+' : ''}${num(s.dIdx, 1)}%</b> за период</div>
+        ${by.miss.length ? `<h3>Дни спада и причины</h3><ul class="day-list">${by.miss.map((k) => { const c = a.days[k];
+          return dayBtn(k, c.pen ? `срывы перевесили: ${signed(c.xp)} XP (штрафы −${c.pen})` : 'день без отметок'); }).join('')}</ul>` : ''}
+        ${by.hold.length ? `<h3>Дни без роста: не хватило до минимума</h3><ul class="day-list">${by.hold.map((k) => { const c = a.days[k];
+          return dayBtn(k, `${signed(c.xp)} из ${minXP} XP${c.pen ? `, штрафы −${c.pen}` : ''}`); }).join('')}</ul>` : ''}
+      </div>`;
+    }
+    if (rep.stat === 'days') {
+      const cnt = {};
+      ks.forEach((k) => { const st = effStatus(k); cnt[st] = (cnt[st] || 0) + 1; });
+      return `<div class="stat-panel">
+        <div class="row" style="justify-content:space-between;align-items:baseline"><h2>Дни по статусам</h2>${close}</div>
+        <p class="lead">Нажмите на статус, и таблица «По дням» покажет только эти дни.</p>
+        <div class="tags">${Object.keys(STATUS_NAMES).filter((st) => cnt[st]).map((st) =>
+          `<button class="tagbtn${rep.status === st ? ' on' : ''}" data-act="repStatus" data-st="${st}">${STATUS_NAMES[st]}<b>${cnt[st]}</b></button>`).join('')}</div>
+      </div>`;
+    }
+    return '';
   }
 
   // ---------- срывы в отчёте ----------
@@ -2100,6 +2227,21 @@
     },
     import: () => document.getElementById('importFile').click(),
     repPeriod: (el) => { rep.period = Number(el.dataset.p); render(); },
+    repStat: (el) => {
+      const s = el.dataset.s;
+      const scrollTo = (id) => setTimeout(() => { const b = document.getElementById(id); if (b) b.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 0);
+      if (STAT_STATUS[s]) { // «дней роста», «дней спада» — фильтр таблицы по дням
+        rep.status = rep.status === STAT_STATUS[s] ? null : STAT_STATUS[s]; rep.stat = null; render();
+        if (rep.status) scrollTo('daysCard');
+      } else if (s === 'sb' || s === 'sbxp') { rep.sb = null; render(); scrollTo('sbReport'); }
+      else { rep.stat = rep.stat === s || !s ? null : s; render(); }
+    },
+    repStatus: (el) => { rep.status = el.dataset.st || null; render(); if (rep.status) { const b = document.getElementById('daysCard'); if (b) b.scrollIntoView({ behavior: 'smooth', block: 'start' }); } },
+    repGo: (el) => { const b = document.getElementById(el.dataset.to); if (b) b.scrollIntoView({ behavior: 'smooth', block: 'start' }); },
+    repDay: (el) => {
+      const k = el.dataset.k; rep.open[k] = true; rep.status = null; rep.tag = null; render();
+      const row = document.querySelector(`tr[data-act="repRow"][data-k="${k}"]`); if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    },
     repSb: (el) => {
       rep.sb = rep.sb === el.dataset.id ? null : el.dataset.id; render();
       const box = document.getElementById('sbReport'); if (box) box.scrollIntoView({ block: 'start' });
